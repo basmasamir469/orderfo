@@ -54,7 +54,7 @@ public function register(RegisterRequest $request){
     return $this->dataResponse(null, 'verification code is sent to your email check it please', 200);
 }
 
-// verifyUser
+// verifyUser  
 public function sendVerifyCode(Request $request){
     // type,value,code
    $validator=Validator::make($request->all(),
