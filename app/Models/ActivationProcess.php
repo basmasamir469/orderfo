@@ -11,11 +11,6 @@ class ActivationProcess extends Model
     public $timestamps = true;
     protected $guarded=[];
 
-    public function user()
-    {
-        return $this->belongsTo('App\Models\User');
-    }
-
     /**
      * status
      * 

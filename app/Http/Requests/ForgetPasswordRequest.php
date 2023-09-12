@@ -21,9 +21,6 @@ class ForgetPasswordRequest extends FormRequest
      */
     public function rules(): array
     {
-        // $value=$this->type;
-        // $field=is_numeric($value)?'phone':'email';
-        // $rule=($field=='email')?'|email':'';
         $rule=($this->type=='email')?'|email':'';
         return [
             //

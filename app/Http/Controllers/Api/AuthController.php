@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CheckCodeRequest;
 use App\Http\Requests\ForgetPasswordRequest;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
@@ -55,141 +56,174 @@ public function register(RegisterRequest $request){
 }
 
 // verifyUser  
-public function sendVerifyCode(Request $request){
+public function checkCode(CheckCodeRequest $request){
     // type,value,code
-   $validator=Validator::make($request->all(),
-   [
-    'code'=>'required'
-   ]
-   );  
-   if($validator->fails()){
-    return response()->json(['message'=>$validator->errors()->first()]);
-   }
-   $user=User::whereHas('activation_processes',function($query) use($request){
-        return $query->where('code',$request->code);
-   })->first();  
-   if($user){
-    $user->update([
+  $data = $request->validated();
+  $activated = ActivationProcess::where(['type'=>$data['type'],'value'=>$data['value'],'code'=>$data['code']])->first();
+  $user = User::where($data['type'],$data['value'])->first();
+  if($activated){
+
+    DB::beginTransaction();
+
+    $activated->update(['status'=>1]);
+
+   if($data['type'] == 'email'){
+
+     $user->update([
         'is_active_email'=>1]);
-    $user->activation_processes()->delete();
-    return response()->json(['status'=>200,'message'=>'your email is verified successfully']);
+   }else{
+     $user->update([
+        'is_active_phone'=>1]);
+   }
+   ActivationProcess::where(['type'=>$data['type'],'value'=>$data['value'],'status'=>0])->first()?->delete();
+
+   DB::commit();
+
+   return $this->dataResponse(null, 'your email is verified successfully', 200);
     }
-    return response()->json(['status'=>422,'message'=>'code is invalid please try again']);
+
+  return $this->dataResponse(null, 'code is invalid please try again', 422);
     }
 
 
 
 
 public function login(LoginRequest $request){
-    $type=$request->type;
-    $value=$request->value;
-    // $field=filter_var($value,FILTER_VALIDATE_EMAIL)?'email':'phone';
-    // $request->merge([$type=>$value]);
-  if(Auth::attempt([$type => $value, 'password' => $request->password])){     
+
+ $data = $request->validated();
+  if(Auth::attempt([$data['type'] => $data['value'], 'password' => $data['password']])){
+
        $user=$request->user();
-       $token= $user->createToken("ORDAVO")->plainTextToken;
-       if($user->is_active_email){
-         return response()->json(['status'=>200,'message'=>'logged in successfully','data'=>[
+
+       $token= $user->createToken("ORDERFO")->plainTextToken;
+
+       $activated=$data['type']=='email'?$user->is_active_email:$user->is_active_phone;
+
+       if($activated){
+
+        return $this->dataResponse([
             'activation'=> 1 ,
-            'token' =>$token
-        ]]);
+            'token' =>$token ], 'logged in successfully',200);
         
         }
-        return response()->json(['status' => 422, 'message' => 'failed to login your account is not activated','data'=>[
-            'activation'=> 0 ,
-        ]]);
+        return $this->dataResponse([
+            'activation'=> 0],'failed to login your account is not activated',422);
     }
-    return response()->json(['status' => 422, 'message' => 'failed to login password && email does not match our record']);
+    return $this->dataResponse(null,'failed to login password && email does not match our record',422);
 }
 
 public function forgetPassword(ForgetPasswordRequest $request){
-    $type=$request->type;
-    $value=$request->value;
-    $user=User::where($type,$value)->first();
-    $code='020'.rand(11111111,99999999);
+
+    $data = $request->validated();
+    $user = User::where($data['type'],$data['value'])->first();
+    $code = '020'.rand(11111111,99999999);
+
     if($user){
+
         $reset=DB::table('password_resets')->insert([
-          'email'=>$value,
+          'email'=>$data['value'],
           'token'=>$code,
           'created_at'=>Carbon::now('Africa/Cairo')
         ]);
+
         if($reset){
-            Mail::to($value)
+            Mail::to($data['value'])
             ->bcc("basmaelazony@gmail.com")
             ->send(new ForgetPassword($code));
 
-            return response()->json(['status'=>true,'message'=>'we have sent you reset password code!']);
+            return $this->dataResponse(null, 'we have sent you reset password code!',200);
+    
         }
-    }
-    return response()->json(['status'=>401,'message'=>'email not found']);
 
+           return $this->dataResponse(null, 'something error is happened please try again!',500);
+
+    }
+    return $this->dataResponse(null, 'email not found',401);
 }
 
 
-public function sendResetPasswordCode(SendResetPasswordCodeRequest $request){
-    $request->merge(['value'=>DB::table('password_resets')->select('email')->latest()->first()->email]);
-    $code=DB::table('password_resets')->where(['email'=>$request->value,'token'=>$request->code])->first();
+public function checkResetPasswordCode(SendResetPasswordCodeRequest $request){
+    $data = $request->validated();
+    // $request->merge(['value'=>DB::table('password_resets')->select('email')->latest()->first()->email]);
+
+    $code = DB::table('password_resets')->where(['email'=>$data['value'],'token'=>$data['code']])->first();
+
     if($code){
-        return response()->json(['status'=>200,'message'=>'code is valid']);
+        return $this->dataResponse(null, 'code is valid',200);
     }
-    return response()->json(['status'=>422,'message'=>'code is invalid']);
+       return $this->dataResponse(null, 'code is invalid',422);
+
 
 }
 
 public function resetPassword(ResetPasswordRequest $request){
 
-$request->merge(['value'=>DB::table('password_resets')->select('email')->latest()->first()->email]);
-$request['password']=Hash::make($request->password);
-$type=filter_var($request['value'],FILTER_VALIDATE_EMAIL)?'email':'phone';
-$updated=User::where($type,$request['value'])->update([
-'password'=>$request['password']
+$data = $request->validated();
+// $request->merge(['value'=>DB::table('password_resets')->select('email')->latest()->first()->email]);
+$data['password']=Hash::make($data['password']);
+// $type=filter_var($data['value'],FILTER_VALIDATE_EMAIL)?'email':'phone';
+$updated = User::where($data['type'],$data['value'])->update([
+'password'=>$data['password']
 ]);
 if($updated){
-    DB::table('password_resets')->where(['email'=>$request->value])->delete();
-   return response()->json(['status'=>200,'message'=>'password is updated successfully']);
+
+    DB::table('password_resets')->where(['email'=>$data['value']])->delete();
+
+   return $this->dataResponse(null, 'password is updated successfully',200);
 }
-    return response()->json(['status'=>500,'message'=>'failed to update please try again']);
+    return $this->dataResponse(null, 'failed to update please try again',500);
 
 }
 
 
 public function logout(Request $request){
+
     if($request->user()->currentAccessToken()->delete()){
-        return response()->json(['status'=>200,'message'=>'logged out successfully']); 
+
+    return $this->dataResponse(null, 'logged out successfully',200);
+
     }
-    return response()->json(['status'=>500,'message'=>' failed to logout']); 
+
+    return $this->dataResponse(null, 'failed to logout',500);
 }
 
 
 public function getProfile(){
-    $user=auth()->user();
-    return response()->json(['status'=>200,'user'=>fractal($user,new UserTransformer($user))->toArray()]);
+
+    $user = auth()->user();
+
+    return $this->dataResponse(['user'=>fractal($user,new UserTransformer($user))->toArray()], '',200);
 }
 
 public function updateProfile(UpdateProfileRequest $request){
-    $input=$request->all();
-    if(empty($request['password'])){
-        $input=Arr::except($request->all(),['password']);
+    $data=$request->validated();
+    if(empty($data['password'])){
+        $data=Arr::except($data,['password']);
     }
     else{
-        $input['password']=Hash::make($input['password']);
+        $data['password'] = Hash::make($data['password']);
     }
-     if(User::find(auth()->user()->id)->update($input)){
-        return response()->json(['status'=>200,'message'=>'profile updated successfully']);
-     }
-     return response()->json(['status'=>500,'message'=>'failed to update']);
+     if(User::find(auth()->user()->id)->update($data)){
+
+        return $this->dataResponse(null, 'profile updated successfully',200);
+     }     
+     return $this->dataResponse(null, 'failed to update',500);
 
 }
 
 public function uploadImage(Request $request){
     // $request->user()->clearMediaCollection('users_images');
+
     $request->user()->media()->delete();
+
     if($request->image&&$request->user()
+
     ->addMedia($request->image)
+
     ->toMediaCollection('users-images')){
-        return response()->json(['status'=>200,'message'=>'image uploaded successfully']);
+        return $this->dataResponse(null, 'image uploaded successfully',200);
     }
-        return response()->json(['status'=>500,'message'=>'something wrong is happened !failed to upload image ']);
+    return $this->dataResponse(null, 'something wrong is happened !failed to upload image',500);
 }
 
 }

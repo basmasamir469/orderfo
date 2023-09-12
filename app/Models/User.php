@@ -48,12 +48,6 @@ class User extends Authenticatable implements HasMedia
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    public function activation_processes()
-    {
-        return $this->hasMany('App\Models\ActivationProcess','user_id');
-    }
-
     public function favResturants()
     {
         return $this->belongsToMany('App\Models\Resturant');

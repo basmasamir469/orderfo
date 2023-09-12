@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResetPasswordRequest extends FormRequest
+class CheckCodeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,11 +21,13 @@ class ResetPasswordRequest extends FormRequest
      */
     public function rules(): array
     {
+        $rule=($this->type=='email')?'|email':'';
         return [
             //
-            'password' =>'required|confirmed|min:6',
             'type'=>'required|in:email,phone',
-            'value'=>'required'
+            'value' => 'required'.$rule,
+            'code'=>'required'
+            
         ];
     }
 }
