@@ -106,9 +106,26 @@ public function login(LoginRequest $request){
             
         }
         // send code according to type
+        $code = rand(11111,99999);
+        ActivationProcess::create([
+            'code'  => $code,
+            'status'=> 0 ,
+            'type'  => $data['type'],
+            'value' => $data['email']
+        ]);
+        if($data['type']=='email'){
+            Mail::to($user->email)
+            ->bcc("basmaelazony@gmail.com")
+            ->send(new VerifyEmail($code));
+   
+       return $this->dataResponse([
+           'activation'=> 0],'failed to login your account is not activated check your email',200);
 
-        return $this->dataResponse([
-            'activation'=> 0],'failed to login your account is not activated',200);
+        }
+
+        // if data type is phone 
+
+
     }
     return $this->dataResponse(null,'failed to login password && email does not match our record',422);
 }
@@ -122,17 +139,25 @@ public function forgetPassword(ForgetPasswordRequest $request){
     if($user){
 
         $reset=DB::table('password_resets')->insert([
-          'email'=>$data['value'],
+          'value'=>$data['value'],
           'token'=>$code,
           'created_at'=>Carbon::now('Africa/Cairo')
         ]);
 
         if($reset){
+
+            if($data['type']=='email'){
             Mail::to($data['value'])
             ->bcc("basmaelazony@gmail.com")
             ->send(new ForgetPassword($code));
 
             return $this->dataResponse(null, 'we have sent you reset password code!',200);
+            }
+
+            // if data type is phone 
+
+
+
     
         }
 
@@ -147,7 +172,7 @@ public function checkResetPasswordCode(SendResetPasswordCodeRequest $request){
     $data = $request->validated();
     // $request->merge(['value'=>DB::table('password_resets')->select('email')->latest()->first()->email]);
 
-    $code = DB::table('password_resets')->where(['email'=>$data['value'],'token'=>$data['code']])->first();
+    $code = DB::table('password_resets')->where(['value'=>$data['value'],'token'=>$data['code']])->first();
 
     if($code){
         return $this->dataResponse(null, 'code is valid',200);
@@ -168,7 +193,7 @@ $updated = User::where($data['type'],$data['value'])->update([
 ]);
 if($updated){
 
-    DB::table('password_resets')->where(['email'=>$data['value']])->delete();
+    DB::table('password_resets')->where(['value'=>$data['value']])->delete();
 
    return $this->dataResponse(null, 'password is updated successfully',200);
 }
@@ -198,17 +223,14 @@ public function getProfile(){
 
 public function updateProfile(UpdateProfileRequest $request){
     $data=$request->validated();
-    if(empty($data['password'])){
-        $data=Arr::except($data,['password']);
-    }
-    else{
-        $data['password'] = Hash::make($data['password']);
-    }
+    if(Hash::check($data['password'],auth()->user()->password)){
      if(User::find(auth()->user()->id)->update($data)){
 
         return $this->dataResponse(null, 'profile updated successfully',200);
      }     
      return $this->dataResponse(null, 'failed to update',500);
+    }
+    return $this->dataResponse(null, ' failed to update password does not match our record ',422);
 
 }
 
