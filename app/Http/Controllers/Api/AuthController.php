@@ -56,7 +56,7 @@ public function register(RegisterRequest $request){
 }
 
 // verifyUser  
-public function checkCode(CheckCodeRequest $request){
+public function verifyUser(CheckCodeRequest $request){
     // type,value,code
   $data = $request->validated();
   $activated = ActivationProcess::where(['type'=>$data['type'],'value'=>$data['value'],'code'=>$data['code']])->first();
@@ -75,7 +75,7 @@ public function checkCode(CheckCodeRequest $request){
      $user->update([
         'is_active_phone'=>1]);
    }
-   ActivationProcess::where(['type'=>$data['type'],'value'=>$data['value'],'status'=>0])->first()?->delete();
+   ActivationProcess::where(['type'=>$data['type'],'value'=>$data['value'],'status'=>0])->delete();
 
    DB::commit();
 
@@ -95,31 +95,20 @@ public function login(LoginRequest $request){
 
        $user=$request->user();
 
-       $token= $user->createToken("ORDERFO")->plainTextToken;
-
        $activated=$data['type']=='email'?$user->is_active_email:$user->is_active_phone;
 
        if($activated){
+            $token= $user->createToken("ORDERFO")->plainTextToken;
+
+            return $this->dataResponse([
+                'activation'=> 1 ,
+                'token' =>$token ], 'logged in successfully',200);
+            
+        }
+        // send code according to type
 
         return $this->dataResponse([
-            'activation'=> 1 ,
-            'token' =>$token ], 'logged in successfully',200);
-        
-        }
-        $code = rand(11111,99999);
-        ActivationProcess::create([
-            'code'  => $code,
-            'status'=> 0 ,
-            'type'  => 'email',
-            'value' => $data['email']
-        ]);
-        
-            Mail::to($user->email)
-             ->bcc("basmaelazony@gmail.com")
-             ->send(new VerifyEmail($code));
-    
-        return $this->dataResponse([
-            'activation'=> 0],'failed to login your account is not activated',422);
+            'activation'=> 0],'failed to login your account is not activated',200);
     }
     return $this->dataResponse(null,'failed to login password && email does not match our record',422);
 }
@@ -128,7 +117,7 @@ public function forgetPassword(ForgetPasswordRequest $request){
 
     $data = $request->validated();
     $user = User::where($data['type'],$data['value'])->first();
-    $code = '020'.rand(11111111,99999999);
+    $code = rand(11111111,99999999);
 
     if($user){
 
