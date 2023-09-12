@@ -11,10 +11,10 @@ class CreateActivationProcessesTable extends Migration {
 		Schema::create('activation_processes', function(Blueprint $table) {
 			$table->increments('id');
 			$table->timestamps();
-			$table->bigInteger('user_id')->unsigned();
 			$table->string('code')->nullable();
+			$table->string('value')->nullable();
 			$table->integer('status');
-			$table->integer('type');
+			$table->enum('type',array('email','mobile'));
 		});
 	}
 

@@ -16,4 +16,11 @@ class ActivationProcess extends Model
         return $this->belongsTo('App\Models\User');
     }
 
+    /**
+     * status
+     * 
+     * 0 --> pnding
+     * 1 --> verified
+     */
+
 }

@@ -11,6 +11,7 @@ use App\Http\Requests\SendResetPasswordCodeRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Mail\ForgetPassword;
 use App\Mail\VerifyEmail;
+use App\Models\ActivationProcess;
 use App\Models\User;
 use App\Transformers\UserTransformer;
 use Carbon\Carbon;
@@ -27,33 +28,35 @@ class AuthController extends Controller
 {
     //
 public function register(RegisterRequest $request){
-        try{
-    $request['password']=Hash::make($request->password);
+
+    $data = $request->validated();
+    $data['password'] = Hash::make($request->password);
     DB::beginTransaction();
-    $user=User::create($request->all());
-    $code=$user->activation_processes()->create([
-        'code'=>rand(11111,99999),
-        'status'=>1, //pending
-        'type'=>0 //email
+    $user = User::create($data);
+
+    $code = rand(11111,99999);
+    ActivationProcess::create([
+        'code'  => $code,
+        'status'=> 0 ,
+        'type'  => 'email',
+        'value' => $data['email']
     ]);
+    
     DB::commit();
-    if($code){
+    try{
         Mail::to($user->email)
-             ->bcc("basmaelazony@gmail.com")
-             ->send(new VerifyEmail($code));
-
-             return response()->json(['status'=>true,'message'=>'verification code is sent to your email check it please']);
-            }
-    return response()->json(['message'=>'something wrong please try again']);
+         ->bcc("basmaelazony@gmail.com")
+         ->send(new VerifyEmail($code));
+    }catch(\Exception $e){
+       // return response()->json(['status'=>false,'message'=>$e->getMessage()]);
     }
 
-catch(\Exception $e){
- DB::rollBack();
- return response()->json(['status'=>false,'message'=>$e->getMessage()]);
+    return $this->dataResponse(null, 'verification code is sent to your email check it please', 200);
 }
-    }
 
+// verifyUser
 public function sendVerifyCode(Request $request){
+    // type,value,code
    $validator=Validator::make($request->all(),
    [
     'code'=>'required'
@@ -74,6 +77,9 @@ public function sendVerifyCode(Request $request){
     return response()->json(['status'=>422,'message'=>'code is invalid please try again']);
     }
 
+
+
+
 public function login(LoginRequest $request){
     $type=$request->type;
     $value=$request->value;
@@ -81,11 +87,17 @@ public function login(LoginRequest $request){
     // $request->merge([$type=>$value]);
   if(Auth::attempt([$type => $value, 'password' => $request->password])){     
        $user=$request->user();
-       $token= $user->createToken("API TOKEN")->plainTextToken;
+       $token= $user->createToken("ORDAVO")->plainTextToken;
        if($user->is_active_email){
-         return response()->json(['status'=>200,'message'=>'logged in successfully','token' =>$token]);
+         return response()->json(['status'=>200,'message'=>'logged in successfully','data'=>[
+            'activation'=> 1 ,
+            'token' =>$token
+        ]]);
+        
         }
-        return response()->json(['status' => 422, 'message' => 'failed to login your account is not activated']);
+        return response()->json(['status' => 422, 'message' => 'failed to login your account is not activated','data'=>[
+            'activation'=> 0 ,
+        ]]);
     }
     return response()->json(['status' => 422, 'message' => 'failed to login password && email does not match our record']);
 }
