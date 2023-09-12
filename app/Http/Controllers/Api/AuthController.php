@@ -67,7 +67,7 @@ public function sendVerifyCode(Request $request){
    }
    $user=User::whereHas('activation_processes',function($query) use($request){
         return $query->where('code',$request->code);
-   })->first();
+   })->first();  
    if($user){
     $user->update([
         'is_active_email'=>1]);
