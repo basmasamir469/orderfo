@@ -61,7 +61,7 @@ public function sendVerifyCode(Request $request){
    [
     'code'=>'required'
    ]
-   );
+   );  
    if($validator->fails()){
     return response()->json(['message'=>$validator->errors()->first()]);
    }
