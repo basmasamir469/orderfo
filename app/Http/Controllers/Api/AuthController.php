@@ -106,6 +106,18 @@ public function login(LoginRequest $request){
             'token' =>$token ], 'logged in successfully',200);
         
         }
+        $code = rand(11111,99999);
+        ActivationProcess::create([
+            'code'  => $code,
+            'status'=> 0 ,
+            'type'  => 'email',
+            'value' => $data['email']
+        ]);
+        
+            Mail::to($user->email)
+             ->bcc("basmaelazony@gmail.com")
+             ->send(new VerifyEmail($code));
+    
         return $this->dataResponse([
             'activation'=> 0],'failed to login your account is not activated',422);
     }
