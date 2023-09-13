@@ -111,7 +111,7 @@ public function login(LoginRequest $request){
             'code'  => $code,
             'status'=> 0 ,
             'type'  => $data['type'],
-            'value' => $data['email']
+            'value' => $data['value']
         ]);
         if($data['type']=='email'){
             Mail::to($user->email)

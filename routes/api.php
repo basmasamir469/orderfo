@@ -22,7 +22,7 @@ Route::group(['namespace'=>'Api'],function(){
     Route::group(['prefix'=>'v1'],function(){
 
         Route::post('register',[AuthController::class,'register']);
-        Route::post('verify',[AuthController::class,'checkCode'])->name('users.verifyemail');
+        Route::post('verify',[AuthController::class,'verifyUser'])->name('users.verifyemail');
         Route::post('login',[AuthController::class,'login']);
         Route::post('forget-password',[AuthController::class,'forgetPassword'])->name('users.forgetpassword');
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);

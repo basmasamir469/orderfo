@@ -26,7 +26,7 @@ class UpdateProfileRequest extends FormRequest
             'fname'=>'required',
             'lname'=>'required',
             'email'=>'required|email|unique:users,email,'.$this->user()->id,
-            'password'=>'min:6|confirmed',
+            'password'=>'required',
             'phone' => 'required|unique:users,phone,'.$this->user()->id.'|regex:/(01)[0-9]{9}/',
             
         ];
