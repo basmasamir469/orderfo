@@ -15,7 +15,7 @@ class Category extends Model implements TranslatableContract,HasMedia
 
     
     public $translatedAttributes = ['name'];
-
+    protected $translationForeignKey = 'category_id';
     protected $table = 'categories';
     public $timestamps = true;
     protected $guarded=[];

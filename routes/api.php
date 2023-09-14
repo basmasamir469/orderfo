@@ -28,6 +28,8 @@ Route::group(['namespace'=>'Api'],function(){
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);
         Route::post('reset-password',[AuthController::class,'resetPassword'])->name('users.resetpassword');
 
+        Route::resource('categories','CategoryController')->only('index');
+
         Route::group(['middleware'=>'auth:sanctum'],function(){
 
             Route::get('profile',[AuthController::class,'getProfile'])->name('users.profile');
