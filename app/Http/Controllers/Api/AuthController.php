@@ -34,6 +34,7 @@ public function register(RegisterRequest $request){
     $data['password'] = Hash::make($request->password);
     DB::beginTransaction();
     $user = User::create($data);
+    $user->assignRole('user');
 
     $code = rand(11111,99999);
     ActivationProcess::create([

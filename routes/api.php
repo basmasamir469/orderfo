@@ -28,16 +28,24 @@ Route::group(['namespace'=>'Api'],function(){
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);
         Route::post('reset-password',[AuthController::class,'resetPassword'])->name('users.resetpassword');
 
-        Route::resource('categories','CategoryController')->only('index');
 
         Route::group(['middleware'=>'auth:sanctum'],function(){
-
-            Route::get('profile',[AuthController::class,'getProfile'])->name('users.profile');
-            Route::put('profile/update',[AuthController::class,'updateProfile'])->name('users.updateProfile');
-            Route::post('logout',[AuthController::class,'logout']);
-            Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');
+             
+            Route::group(['middleware' => ['role:user']], function () {
+                //
+                Route::get('profile',[AuthController::class,'getProfile'])->name('users.profile');
+                Route::put('profile/update',[AuthController::class,'updateProfile'])->name('users.updateProfile');
+                Route::post('logout',[AuthController::class,'logout']);
+                Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');    
+            });    
     
         });
+
+                
+            Route::resource('categories','CategoryController');
+            Route::resource('sliders','SliderController');
+            Route::resource('resturants','ResturantController');        
+        
 
     });
 });

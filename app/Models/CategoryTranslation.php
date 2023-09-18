@@ -8,7 +8,7 @@ class CategoryTranslation extends Model
 {
 
     protected $table = 'category_translations';
-    // protected $translationForeignKey = 'category_id';
+    protected $translationForeignKey = 'category_id';
     public $timestamps = false;
     protected $guarded=[];
 

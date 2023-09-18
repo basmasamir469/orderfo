@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\categories\StoreCategoryRequest;
-use App\Models\Category;
-use App\Transformers\CategoryTransformer;
+use App\Http\Requests\sliders\SliderRequest;
+use App\Models\Slider;
+use App\Transformers\SliderTransformer;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
-class CategoryController extends Controller
+class SliderController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,11 +23,12 @@ class CategoryController extends Controller
     public function index()
     {
         //
-        $categories = Category::get();
+        $sliders = Slider::get();
 
         $fractal=new Manager();
 
-        return $this->dataResponse(['categories'=>$fractal->createData(new Collection($categories,new CategoryTransformer))->toArray()], 'all categories', 200);
+        return $this->dataResponse(['sliders'=>$fractal->createData(new Collection($sliders,new SliderTransformer))->toArray()], 'all sliders', 200);
+
     }
 
     /**
@@ -41,33 +42,35 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategoryRequest $request)
+    public function store(SliderRequest $request)
     {
         //
         $data = $request->validated();
 
-        $category = Category::create([
+        $slider = Slider::create([
 
-            'en'=>['name'=>$data['name_en']],
-            'ar'=>['name'=>$data['name_ar']]
+            'en'=>['text'=>$data['text_en']],
+            'ar'=>['text'=>$data['text_ar']],
+            'resturant_id'=>$data['resturant_id']
         ]);
 
         try{
 
-        $category->addMedia($data['logo'])
+        $slider->addMedia($data['image'])
 
-        ->toMediaCollection('categories-logos');
+        ->toMediaCollection('sliders-images');
         }
         catch(\Exception $e){
 
             return $this->dataResponse(null,__('failed to store'),500);
         }
 
-        if($category){
+        if($slider){
 
-        return $this->dataResponse(fractal($category,new CategoryTransformer)->toArray(),__('stored successfully'),200);
+        return $this->dataResponse(fractal($slider,new SliderTransformer)->toArray(),__('stored successfully'),200);
         }
         return $this->dataResponse(null,__('failed to store'),500);
+
     }
 
     /**
@@ -89,25 +92,26 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreCategoryRequest $request, string $id)
+    public function update(SliderRequest $request, string $id)
     {
         //
         $data = $request->validated();
 
-        $category = Category::findOrFail($id);
+        $slider = Slider::findOrFail($id);
 
-        $updated = $category->update([
-           'en'=>['name'=>$data['name_en']],
-           'ar'=>['name'=>$data['name_ar']],
+        $updated = $slider->update([
+           'en'=>['text'=>$data['text_en']],
+           'ar'=>['text'=>$data['text_ar']],
+           'resturant_id'=>$data['resturant_id']
         ]);
 
         try{
 
-        $category->clearMediaCollection('categories-logos');
+        $slider->clearMediaCollection('sliders-images');
 
-        $category->addMedia($data['logo'])
+        $slider->addMedia($data['image'])
 
-        ->toMediaCollection('categories-logos');
+        ->toMediaCollection('sliders-images');
         }
         catch(\Exception $e){
             
@@ -116,7 +120,7 @@ class CategoryController extends Controller
 
            if($updated)
            {
-            return $this->dataResponse(fractal($category->fresh(),new CategoryTransformer)->toArray(),__('updated successfully'),200);
+            return $this->dataResponse(fractal($slider->fresh(),new SliderTransformer)->toArray(),__('updated successfully'),200);
            }
             return $this->dataResponse(null,__('failed to update'),500);
 
@@ -130,9 +134,9 @@ class CategoryController extends Controller
     public function destroy(string $id)
     {
         //
-        $category = Category::findOrFail($id);
+        $slider = Slider::findOrFail($id);
 
-        if($category->delete() && $category->clearMediaCollection('categories-logos')){
+        if($slider->delete() && $slider->clearMediaCollection('sliders-images')){
 
             return $this->dataResponse(null,__('deleted successfully'),200);
         }
