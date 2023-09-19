@@ -33,12 +33,12 @@ class ResturantController extends Controller
 
             return $q->select('resturant_id')
             ->groupBy('resturant_id')
-            ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc");
-          }])
-        ->latest()
-        ->skip($this->limit)
-        ->take(2)
-        ->get();
+            ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) DESC");
+             }])
+            ->latest()
+            ->skip($this->limit)
+            ->take(2)
+            ->get();
 
         $this->limit +=2;
 

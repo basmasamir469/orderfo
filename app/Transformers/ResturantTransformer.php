@@ -15,7 +15,7 @@ class ResturantTransformer extends TransformerAbstract
      */
     protected array $defaultIncludes = [
         //
-        'paymentWays'
+        'payment_ways'
     ];
     
     /**

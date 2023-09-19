@@ -14,7 +14,7 @@ class Review extends Model
 
     public function resturant()
     {
-        return $this->belongsTo('App\Models\Resturant');
+        return $this->belongsTo('App\Models\Resturant','resturant_id');
     }
 
     public function user()
