@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
+use App\Models\PaymentWay;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -34,6 +35,16 @@ class DatabaseSeeder extends Seeder
         ]);
         $role=Role::where(['name'=>'admin','guard_name'=>'api'])->first();
         $admin->assignRole($role);
+
         $this->call(CategorySeeder::class);
+
+        $payment_ways=['visa','cash'];
+
+        foreach($payment_ways as $way){
+          PaymentWay::create([
+            'name'=>$way,
+              ]);
+
+        }
     }
 }

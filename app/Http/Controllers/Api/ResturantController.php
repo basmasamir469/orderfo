@@ -87,6 +87,12 @@ class ResturantController extends Controller
 
         try{
 
+        // foreach($data['payment_ways'] as $way){
+             
+            $resturant->paymentWays()->attach($data['payment_ways']);
+
+        // }
+
         $resturant->addMedia($data['logo'])
 
         ->toMediaCollection('resturants-logos');
@@ -157,6 +163,7 @@ class ResturantController extends Controller
         ]);
 
         try{
+            $resturant->paymentWays()->sync($data['payment_ways']);
             if(!empty($data['logo'])){
 
         $resturant->clearMediaCollection('resturants-logos');

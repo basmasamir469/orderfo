@@ -25,8 +25,8 @@ class UpdateResturantRequest extends FormRequest
             //
             'name_en'=>'required',
             'name_ar'=>'required',
-            'to_time'=>'required',
-            'from_time'=>'required',
+            'from_time'=>'required|date_format:H:i',    
+            'to_time'=>'required|date_format:H:i|after:from_time',
             'latitude'=>'required',
             'longitude'=>'required',
             'minimum_cost'=>'required',
@@ -37,7 +37,8 @@ class UpdateResturantRequest extends FormRequest
             'category_id'=>'required',
             'address'=>'required',
             'logo'=>'nullable',
-            'images'=>'nullable'
+            'images'=>'nullable',
+            'payment_ways'=>'required|array'
         ];
     }
 }

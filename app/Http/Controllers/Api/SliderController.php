@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\sliders\SliderRequest;
 use App\Models\Slider;
+use App\Transformers\ResturantTransformer;
 use App\Transformers\SliderTransformer;
 use Illuminate\Http\Request;
 use League\Fractal\Manager;
@@ -17,13 +18,13 @@ class SliderController extends Controller
      */
     public function __construct()
     {
-    	$this->middleware(['auth:sanctum','role:admin'])->except(['index']);
+    	$this->middleware(['auth:sanctum','role:admin'])->except(['index','show']);
     }
 
     public function index()
     {
         //
-        $sliders = Slider::get();
+        $sliders = Slider::latest()->get();
 
         $fractal=new Manager();
 
@@ -79,6 +80,11 @@ class SliderController extends Controller
     public function show(string $id)
     {
         //
+        $slider=Slider::findOrFail($id);
+
+        return $this->dataResponse(['resturant'=>fractal($slider->resturant,new ResturantTransformer)->toArray()], 'resturant details', 200);
+
+        
     }
 
     /**

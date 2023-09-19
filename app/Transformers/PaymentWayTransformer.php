@@ -2,10 +2,10 @@
 
 namespace App\Transformers;
 
-use App\Models\Slider;
+use App\Models\PaymentWay;
 use League\Fractal\TransformerAbstract;
 
-class SliderTransformer extends TransformerAbstract
+class PaymentWayTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
@@ -14,7 +14,6 @@ class SliderTransformer extends TransformerAbstract
      */
     protected array $defaultIncludes = [
         //
-        'resturant'
     ];
     
     /**
@@ -31,22 +30,12 @@ class SliderTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform(Slider $slider)
+    public function transform(PaymentWay $payment_way)
     {
         return [
             //
-            'id'=>$slider->id,
-            'text'=>$slider->text,
-            'image'=>$slider->image,
-            // 'resturant'=>$slider->resturant?->name
+            'id'=>$payment_way->id,
+            'name'=>$payment_way->name
         ];
     }
-
-     public function includeResturant(Slider $slider)
-     {
-         $resturant = $slider->resturant;
-
-        return $this->item($resturant, new ResturantTransformer()); 
-     }
-
 }

@@ -28,6 +28,13 @@ Route::group(['namespace'=>'Api'],function(){
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);
         Route::post('reset-password',[AuthController::class,'resetPassword'])->name('users.resetpassword');
 
+        Route::resource('categories','CategoryController');
+        Route::resource('sliders','SliderController');
+        Route::resource('resturants','ResturantController');
+        Route::post('search','HomeController@search');
+        Route::post('filter','HomeController@filter');              
+
+
 
         Route::group(['middleware'=>'auth:sanctum'],function(){
              
@@ -36,16 +43,11 @@ Route::group(['namespace'=>'Api'],function(){
                 Route::get('profile',[AuthController::class,'getProfile'])->name('users.profile');
                 Route::put('profile/update',[AuthController::class,'updateProfile'])->name('users.updateProfile');
                 Route::post('logout',[AuthController::class,'logout']);
-                Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');    
+                Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');
+                Route::get('resturants/add-fav/{Id}','HomeController@addToFav');                  
             });    
     
-        });
-
-                
-            Route::resource('categories','CategoryController');
-            Route::resource('sliders','SliderController');
-            Route::resource('resturants','ResturantController');        
-        
+        });        
 
     });
 });

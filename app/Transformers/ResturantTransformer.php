@@ -15,6 +15,7 @@ class ResturantTransformer extends TransformerAbstract
      */
     protected array $defaultIncludes = [
         //
+        'paymentWays'
     ];
     
     /**
@@ -50,17 +51,21 @@ class ResturantTransformer extends TransformerAbstract
             'address'=>$resturant->address,
             'offers'=>count($resturant->sliders)? 1 : 0,
             'logo'=>$resturant->logo,
-            'images'=>$resturant->images,
+            'images'=>$resturant->images->map(function($image){
+                return [
+                     'url'=>$image->getUrl()
+                    ];
+            }),
             'reviews'=>$resturant->rate,
             'count_reviews'=>count($resturant->reviews)
         ];
     }
 
-    // public function includeReviews(Resturant $resturant)
-    // {
-    //     $reviews = $resturant->reviews;
+     public function includePaymentWays(Resturant $resturant)
+      {
+         $payment_ways = $resturant->paymentWays;
 
-    //     return $this->collection($reviews, new ReviewTransformer()); 
-    // }
+         return $this->collection($payment_ways, new PaymentWayTransformer()); 
+      }
 
 }

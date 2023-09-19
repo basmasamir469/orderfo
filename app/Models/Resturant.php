@@ -45,6 +45,16 @@ class Resturant extends Model implements TranslatableContract,HasMedia
         return $this->hasMany('App\Models\Order');
     }
 
+    public function meals()
+    {
+        return $this->hasMany('App\Models\Meal');
+    }
+
+    public function paymentWays(){
+
+        return $this->belongsToMany(PaymentWay::class,'payment_way_resturant','resturant_id','payment_way_id');
+    }
+
     public function getLogoAttribute(){
 
         return $this->getFirstMediaUrl('resturants-logos');
@@ -67,6 +77,64 @@ class Resturant extends Model implements TranslatableContract,HasMedia
         //    return round(($q->avg('order_packaging') + $q->avg('delivery_time') + $q->avg('value_of_money')) / count($this->reviews),1);
         //  })->get();
     }
+
+    public function scopeSearch($q,$model){
+
+        $model->when(request('search'),function() use($q){
+
+            return $q->whereTranslationLike('name', '%' . request('search') . '%')
+            ->orWhere('from_time', 'like', '%' . request('search') . '%')
+            ->orWhere('to_time', 'like', '%' . request('search') . '%')
+            ->orWhere('minimum_cost', 'like', '%' . request('search') . '%')
+            ->orWhere('delivery_fee', 'like', '%' . request('search') . '%')
+            ->orWhere('delivery_time', 'like', '%' . request('search') . '%')
+            ->orWhere('description', 'like', '%' . request('search') . '%')
+            ->orWhere('address', 'like', '%' . request('search') . '%')
+            ->orWhere('vat', 'like', '%' . request('search') . '%')
+
+            ->orWhereHas('meals',function($q){
+
+                return $q->whereTranslationLike('name', '%' . request('search') . '%')
+                          ->orWhereTranslationLike('description', '%' . request('search') . '%');
+            });
+
+        });
+
+    }
+
+
+    public function scopeFilter($q,$model){
+
+        $model->when(request('sort_by'),function() use($q){
+
+          if(request('sort_by')=='a_to_z'){
+               return $q->orderByTranslation('name','ASC');
+          }
+
+               return $q->orderBy('delivery_time','DESC');
+
+
+        })->when(request('filter_by'),function() use($q){
+           
+            if(request('filter_by') == 'deals'){
+
+                return $q->whereHas('sliders');
+           }
+           if(request('filter_by') == 'online_payment'){
+
+                return $q->whereHas('paymentWays',function($query){
+
+                    return $query->where('name','visa');
+                });
+           }
+
+ 
+
+        });
+
+    }
+
+
 
 
 }
