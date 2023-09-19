@@ -8,6 +8,12 @@ use League\Fractal\TransformerAbstract;
 
 class ResturantTransformer extends TransformerAbstract
 {
+
+    public function __construct($type = false)
+    {
+        $this->type = $type;
+    }
+
     /**
      * List of resources to automatically include
      *
@@ -34,31 +40,37 @@ class ResturantTransformer extends TransformerAbstract
      */
     public function transform(Resturant $resturant)
     {
-        return [
-            //
+        $array = [
             'id'=>$resturant->id,
             'name'=>$resturant->name,
-            'to_time'=>$resturant->to_time,
-            'from_time'=>$resturant->from_time,
-            'latitude'=>$resturant->latitude,
-            'longitude'=>$resturant->longitude,
-            'minimum_cost'=>$resturant->minimum_cost,
-            'delivery_fee'=>$resturant->delivery_fee,
             'delivery_time'=>$resturant->delivery_time,
-            'description'=>$resturant->description,
-            'vat'=>$resturant->vat,
-            'category_id'=>$resturant->category_id,
-            'address'=>$resturant->address,
-            'offers'=>count($resturant->sliders)? 1 : 0,
             'logo'=>$resturant->logo,
-            'images'=>$resturant->images->map(function($image){
-                return [
-                     'url'=>$image->getUrl()
-                    ];
-            }),
+            'image'=>$resturant->getFirstMediaUrl(),
             'reviews'=>$resturant->rate,
-            'count_reviews'=>count($resturant->reviews)
+            'count_reviews'=>count($resturant->reviews),
+            'is_offered' => 0,
+            'is_favourite' => 0,
+
+            // 'from_time'=>$resturant->from_time,
+            // 'latitude'=>$resturant->latitude,
+            // 'longitude'=>$resturant->longitude,
+            // 'minimum_cost'=>$resturant->minimum_cost,
+            // 'delivery_fee'=>$resturant->delivery_fee,
+            // 'description'=>$resturant->description,
+            // 'vat'=>$resturant->vat,
+            // 'category_id'=>$resturant->category_id,
+            // 'address'=>$resturant->address,
+            // 'offers'=>count($resturant->sliders)? 1 : 0,
+            
         ];
+
+
+        if ($this->type == 'show') {
+            $array['to_time'] = $resturant->to_time;
+        }
+
+        return $array;
+
     }
 
      public function includePaymentWays(Resturant $resturant)

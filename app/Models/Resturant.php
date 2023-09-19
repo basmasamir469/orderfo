@@ -83,14 +83,14 @@ class Resturant extends Model implements TranslatableContract,HasMedia
         $model->when(request('search'),function() use($q){
 
             return $q->whereTranslationLike('name', '%' . request('search') . '%')
-            ->orWhere('from_time', 'like', '%' . request('search') . '%')
-            ->orWhere('to_time', 'like', '%' . request('search') . '%')
-            ->orWhere('minimum_cost', 'like', '%' . request('search') . '%')
-            ->orWhere('delivery_fee', 'like', '%' . request('search') . '%')
-            ->orWhere('delivery_time', 'like', '%' . request('search') . '%')
+            // ->orWhere('from_time', 'like', '%' . request('search') . '%')
+            // ->orWhere('to_time', 'like', '%' . request('search') . '%')
+            // ->orWhere('minimum_cost', 'like', '%' . request('search') . '%')
+            // ->orWhere('delivery_fee', 'like', '%' . request('search') . '%')
+            // ->orWhere('delivery_time', 'like', '%' . request('search') . '%')
             ->orWhere('description', 'like', '%' . request('search') . '%')
             ->orWhere('address', 'like', '%' . request('search') . '%')
-            ->orWhere('vat', 'like', '%' . request('search') . '%')
+            // ->orWhere('vat', 'like', '%' . request('search') . '%')
 
             ->orWhereHas('meals',function($q){
 

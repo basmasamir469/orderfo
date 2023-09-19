@@ -22,12 +22,14 @@ class CategoryController extends Controller
 
     public function index()
     {
-        //
         $categories = Category::get();
 
-        $fractal=new Manager();
+        $categories = fractal()
+            ->collection($categories)
+            ->transformWith(new CategoryTransformer())
+            ->toArray();
 
-        return $this->dataResponse(['categories'=>$fractal->createData(new Collection($categories,new CategoryTransformer))->toArray()], 'all categories', 200);
+        return $this->dataResponse($categories, 'all categories', 200);
     }
 
     /**

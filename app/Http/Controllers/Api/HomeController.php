@@ -12,7 +12,12 @@ use League\Fractal\Resource\Collection;
 
 class HomeController extends Controller
 {
-    //
+    public function home(Request $request){
+
+    }
+
+
+
     public function search(Request $request){
         $resturants = Resturant::query();
 

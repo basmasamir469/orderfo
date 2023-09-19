@@ -23,7 +23,7 @@ class ResturantController extends Controller
      */
     public function __construct()
     {
-    	$this->middleware(['auth:sanctum','role:admin'])->except(['index']);
+    	// $this->middleware(['auth:sanctum','role:admin'])->except(['index']);
     }
 
     public function index()
@@ -35,7 +35,7 @@ class ResturantController extends Controller
             ->groupBy('resturant_id')
             ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) DESC");
              }])
-            ->latest()
+            // ->latest()
             ->skip($this->limit)
             ->take(2)
             ->get();

@@ -28,9 +28,14 @@ Route::group(['namespace'=>'Api'],function(){
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);
         Route::post('reset-password',[AuthController::class,'resetPassword'])->name('users.resetpassword');
 
-        Route::resource('categories','CategoryController');
-        Route::resource('sliders','SliderController');
-        Route::resource('resturants','ResturantController');
+        Route::get('home','HomeController@home');
+        Route::get('resturants','HomeController@restaurants');
+
+
+        // Route::resource('categories','CategoryController');
+        // Route::resource('sliders','SliderController');
+        // Route::resource('resturants','ResturantController');
+        
         Route::post('search','HomeController@search');
         Route::post('filter','HomeController@filter');              
 
