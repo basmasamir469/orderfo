@@ -31,14 +31,15 @@ class ResturantRequest extends FormRequest
             'longitude'=>'required',
             'minimum_cost'=>'required',
             'delivery_fee'=>'required',
-            'delivery_time'=>'required',
+            'delivery_time'=>'required|numeric',
             'description'=>'nullable',
             'vat'=>'required',
             'category_id'=>'required',
             'address'=>'required',
             'logo'=>'required',
             'images'=>'required',
-            'payment_ways'=>'required|array'
+            'payment_ways'=>'required|array',
+            'status'=>'nullable'
         ];
     }
 }

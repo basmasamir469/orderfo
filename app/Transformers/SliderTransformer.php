@@ -12,9 +12,15 @@ class SliderTransformer extends TransformerAbstract
      *
      * @var array
      */
+    private $type;
+
+    public function __construct($type=false){
+
+      $this->type = $type;
+
+    }
     protected array $defaultIncludes = [
         //
-        'resturant'
     ];
     
     /**
@@ -33,20 +39,24 @@ class SliderTransformer extends TransformerAbstract
      */
     public function transform(Slider $slider)
     {
-        return [
+        $array=[
             //
             'id'=>$slider->id,
             'text'=>$slider->text,
             'image'=>$slider->image,
-            // 'resturant'=>$slider->resturant?->name
+            'resturant_id'=>$slider->resturant?->id,
+            'resturant_name'=>$slider->resturant?->name
+
         ];
+        if($this->type=='all_sliders')
+           {
+            $array['resturant_images']=$slider->resturant?->images->map(function($image){
+                return[
+                  'url'=>$image->getUrl()
+                ];
+            });
+           }
+        return $array;
     }
-
-     public function includeResturant(Slider $slider)
-     {
-         $resturant = $slider->resturant;
-
-        return $this->item($resturant, new ResturantTransformer()); 
-     }
 
 }

@@ -3,74 +3,70 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Resturant;
+use App\Models\Slider;
+use App\Transformers\CategoryTransformer;
 use App\Transformers\ResturantTransformer;
+use App\Transformers\SliderTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
 class HomeController extends Controller
 {
-    public function home(Request $request){
+    public function home(){
+           
+        $sliders = Slider::latest()->get();
 
+        $categories = Category::get();
+
+        $categories = fractal()
+            ->collection($categories)
+            ->transformWith(new CategoryTransformer())
+            ->toArray();
+
+        $sliders = fractal()
+            ->collection($sliders)
+            ->transformWith(new SliderTransformer('show'))
+            ->toArray();
+
+        return $this->dataResponse(['sliders'=>$sliders,'categories'=>$categories], 'all sliders', 200);
     }
 
+    public function resturants(Request $request){
 
-
-    public function search(Request $request){
         $resturants = Resturant::query();
 
-        $resturants = $resturants->search($resturants);
+        $resturants = $resturants->search($resturants)->filter($resturants);
 
-        $resturants = $resturants->with(['reviews'=>function($q){
-           return $q->select('resturant_id')
-            ->groupBy('resturant_id')
-            ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc");
-          }])
+        $resturants=$resturants->withCount(['reviews as average_rating' => function ($query) {
+            $query->selectRaw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3, 1)');
+        }])
+            ->orderBy('average_rating','DESC')
             ->latest()
-            ->skip(0)
-            ->take(2)
+            // ->skip(0)
+            // ->take(2)
             ->get();
 
+         //   join('reviews', function (JoinClause $join) {
+        //     $join->on('reviews.resturant_id', '=', 'resturants.id');
 
-        $fractal=new Manager();
+        //    })
+        //    ->orderByRaw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc')
+        //    ->select('reviews.resturant_id')
+        //    ->groupBy('reviews.resturant_id') //see PS:
+
+
+        $resturants = fractal()
+        ->collection($resturants)
+        ->transformWith(new ResturantTransformer())
+        ->toArray();
+
         
-        return $this->dataResponse(['resturants'=>$fractal->createData(new Collection($resturants,new ResturantTransformer))->toArray()], 'all resturants', 200);
-
-    }
-
-    public function filter(Request $request){
-
-        $validator=Validator::make($request->all(),[
-
-         'sort_by'=>'in:a_to_z,fastest_delivery',
-         'filter_by'=>'in:deals,online_payment'
-
-        ]);
-        if($validator->fails()){
-
-            return $this->dataResponse(null,$validator->errors()->first(),422);
-        }
-        $resturants = Resturant::query();
-
-        $resturants=$resturants->filter($resturants);
-
-        $resturants=$resturants->with(['reviews'=>function($q){
-
-           return $q->select('resturant_id')
-            ->groupBy('resturant_id')
-            ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc");
-          }])
-            ->latest()
-            ->skip(0)
-            ->take(2)
-            ->get();
-
-
-        $fractal=new Manager();
-        
-        return $this->dataResponse(['resturants'=>$fractal->createData(new Collection($resturants,new ResturantTransformer))->toArray()], 'all resturants', 200);
+        return $this->dataResponse(['resturants'=>$resturants], 'all resturants', 200);
 
 
     }
@@ -91,4 +87,6 @@ class HomeController extends Controller
 
             
     }
+
+    
 }

@@ -18,7 +18,7 @@ class CreateResturantsTable extends Migration {
 			$table->time('from_time');
 			$table->decimal('minimum_cost');
 			$table->decimal('delivery_fee');
-			$table->string('delivery_time');
+			$table->integer('delivery_time');
 			$table->text('description');
 			$table->decimal('vat');
 			$table->integer('category_id')->unsigned();

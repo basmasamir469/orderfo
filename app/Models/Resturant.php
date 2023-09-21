@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -78,19 +79,56 @@ class Resturant extends Model implements TranslatableContract,HasMedia
         //  })->get();
     }
 
+    public function getIsOfferedAttribute()
+    {
+        if(count($this->whereHas('meals',function($q){
+
+            return $q->whereHas('meal_attributes',function($query){
+
+               return $query->whereNotNull('offer_price');
+             });
+           })->get()
+        ))
+        {
+           return 1;
+        }
+           return 0;
+
+    }
+
+    public function getIsFavouriteAttribute()
+    {
+        $fav_resturants=auth()->user()?->whereHas('favResturants',function($q){
+
+            return $q->where('resturant_id',$this->id);
+
+        })->get();
+        if(is_countable($fav_resturants) && count($fav_resturants))
+        {
+           return 1;
+        }
+           return 0;
+
+    }
+
+    public function getStatusAttribute(){
+
+        if($this->attributes['status'] == 1){
+
+            return 'Opened';
+        }
+            return 'Closed';
+
+    }
+
+
     public function scopeSearch($q,$model){
 
         $model->when(request('search'),function() use($q){
 
             return $q->whereTranslationLike('name', '%' . request('search') . '%')
-            // ->orWhere('from_time', 'like', '%' . request('search') . '%')
-            // ->orWhere('to_time', 'like', '%' . request('search') . '%')
-            // ->orWhere('minimum_cost', 'like', '%' . request('search') . '%')
-            // ->orWhere('delivery_fee', 'like', '%' . request('search') . '%')
-            // ->orWhere('delivery_time', 'like', '%' . request('search') . '%')
             ->orWhere('description', 'like', '%' . request('search') . '%')
             ->orWhere('address', 'like', '%' . request('search') . '%')
-            // ->orWhere('vat', 'like', '%' . request('search') . '%')
 
             ->orWhereHas('meals',function($q){
 
@@ -105,28 +143,56 @@ class Resturant extends Model implements TranslatableContract,HasMedia
 
     public function scopeFilter($q,$model){
 
+        // sort by
+
         $model->when(request('sort_by'),function() use($q){
 
           if(request('sort_by')=='a_to_z'){
                return $q->orderByTranslation('name','ASC');
           }
 
-               return $q->orderBy('delivery_time','DESC');
+               return $q->orderBy('delivery_time','ASC');
 
+        // filter by
 
         })->when(request('filter_by'),function() use($q){
-           
-            if(request('filter_by') == 'deals'){
+              
+            if(in_array('deals',request('filter_by')) && in_array('online_payment',request('filter_by'))){
 
-                return $q->whereHas('sliders');
-           }
-           if(request('filter_by') == 'online_payment'){
+                return $q->whereHas('meals',function($q){
 
-                return $q->whereHas('paymentWays',function($query){
+                    return $q->whereHas('meal_attributes',function($query){
+
+                       return $query->whereNotNull('offer_price');
+                    });
+                })
+                ->WhereHas('paymentWays',function($query){
 
                     return $query->where('name','visa');
                 });
+
+
+
            }
+           else if(in_array('deals',request('filter_by'))){
+
+            return $q->whereHas('meals',function($q){
+                return $q->whereHas('meal_attributes',function($query){
+                   return $query->whereNotNull('offer_price');
+                });
+            });
+
+           }
+           else{
+
+            return $q->whereHas('paymentWays',function($query){
+
+                return $query->where('name','visa');
+            });
+
+
+           }
+
 
  
 
@@ -134,6 +200,15 @@ class Resturant extends Model implements TranslatableContract,HasMedia
 
     }
 
+    public function scopeRate($q,$model){
+
+     return $q->Join('reviews','reviews.resturant_id','=','resturants.id')
+     ->orderByRaw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc')
+     ->groupBy('reviews.resturant_id')
+     ->having('reviews.resturant_id',$this->id)
+     ->select('reviews.resturant_id');
+
+    }
 
 
 

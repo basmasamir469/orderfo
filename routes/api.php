@@ -28,17 +28,13 @@ Route::group(['namespace'=>'Api'],function(){
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);
         Route::post('reset-password',[AuthController::class,'resetPassword'])->name('users.resetpassword');
 
-        Route::get('home','HomeController@home');
-        Route::get('resturants','HomeController@restaurants');
+        Route::get('home','HomeController@home');                 // categories and sliders
+        Route::post('resturants','HomeController@resturants');    //resturants
+        Route::get('all-sliders','SliderController@allSliders');   //sliders page
+        Route::get('all-sliders/{slider}','SliderController@showResturant');  
 
 
-        // Route::resource('categories','CategoryController');
-        // Route::resource('sliders','SliderController');
-        // Route::resource('resturants','ResturantController');
         
-        Route::post('search','HomeController@search');
-        Route::post('filter','HomeController@filter');              
-
 
 
         Route::group(['middleware'=>'auth:sanctum'],function(){

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\resturants\ResturantRequest;
@@ -21,11 +21,6 @@ class ResturantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function __construct()
-    {
-    	// $this->middleware(['auth:sanctum','role:admin'])->except(['index']);
-    }
-
     public function index()
     {
         //
@@ -35,16 +30,19 @@ class ResturantController extends Controller
             ->groupBy('resturant_id')
             ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) DESC");
              }])
-            // ->latest()
+             ->latest()
             ->skip($this->limit)
             ->take(2)
             ->get();
 
         $this->limit +=2;
 
-        $fractal=new Manager();
+        $resturants = fractal()
+        ->collection($resturants)
+        ->transformWith(new ResturantTransformer())
+        ->toArray();
         
-        return $this->dataResponse(['resturants'=>$fractal->createData(new Collection($resturants,new ResturantTransformer))->toArray()], 'all resturants', 200);
+        return $this->dataResponse(['resturants'=>$resturants], 'all resturants', 200);
 
     }
 
@@ -80,18 +78,17 @@ class ResturantController extends Controller
             'description'=>$data['description'],
             'vat'=>$data['vat'],
             'category_id'=>$data['category_id'],
-            'address'=>$data['address']
+            'address'=>$data['address'],
+            'status'=>$request->status
 
 
         ]);
 
         try{
 
-        // foreach($data['payment_ways'] as $way){
              
-            $resturant->paymentWays()->attach($data['payment_ways']);
+        $resturant->paymentWays()->attach($data['payment_ways']);
 
-        // }
 
         $resturant->addMedia($data['logo'])
 
@@ -123,6 +120,10 @@ class ResturantController extends Controller
     public function show(string $id)
     {
         //
+        $resturant=Resturant::findOrFail($id);
+
+        return $this->dataResponse(fractal($resturant->fresh(),new ResturantTransformer('show'))->includePaymentWays()->toArray(),__('updated successfully'),200);
+
     }
 
     /**
@@ -158,7 +159,8 @@ class ResturantController extends Controller
             'description'=>$data['description'],
             'vat'=>$data['vat'],
             'category_id'=>$data['category_id'],
-            'address'=>$data['address']
+            'address'=>$data['address'],
+            'status'=>$request->status
 
         ]);
 

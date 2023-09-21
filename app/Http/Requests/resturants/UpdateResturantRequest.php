@@ -31,14 +31,14 @@ class UpdateResturantRequest extends FormRequest
             'longitude'=>'required',
             'minimum_cost'=>'required',
             'delivery_fee'=>'required',
-            'delivery_time'=>'required',
+            'delivery_time'=>'required|numeric',
             'description'=>'nullable',
             'vat'=>'required',
             'category_id'=>'required',
             'address'=>'required',
             'logo'=>'nullable',
             'images'=>'nullable',
-            'payment_ways'=>'required|array'
+            'payment_ways'=>'required|array',
         ];
     }
 }
