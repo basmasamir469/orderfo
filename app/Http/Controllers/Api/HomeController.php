@@ -51,15 +51,6 @@ class HomeController extends Controller
             // ->take(2)
             ->get();
 
-         //   join('reviews', function (JoinClause $join) {
-        //     $join->on('reviews.resturant_id', '=', 'resturants.id');
-
-        //    })
-        //    ->orderByRaw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc')
-        //    ->select('reviews.resturant_id')
-        //    ->groupBy('reviews.resturant_id') //see PS:
-
-
         $resturants = fractal()
         ->collection($resturants)
         ->transformWith(new ResturantTransformer())
@@ -67,6 +58,15 @@ class HomeController extends Controller
 
         
         return $this->dataResponse(['resturants'=>$resturants], 'all resturants', 200);
+
+                 //   join('reviews', function (JoinClause $join) {
+        //     $join->on('reviews.resturant_id', '=', 'resturants.id');
+
+        //    })
+        //    ->orderByRaw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc')
+        //    ->select('reviews.resturant_id')
+        //    ->groupBy('reviews.resturant_id') //see PS:
+
 
 
     }
