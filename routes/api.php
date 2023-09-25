@@ -28,10 +28,11 @@ Route::group(['namespace'=>'Api'],function(){
         Route::post('reset-password/code',[AuthController::class,'checkResetPasswordCode']);
         Route::post('reset-password',[AuthController::class,'resetPassword'])->name('users.resetpassword');
 
-        Route::get('home','HomeController@home');                 // categories and sliders
-        Route::post('resturants','HomeController@resturants');    //resturants
-        Route::get('all-sliders','SliderController@allSliders');   //sliders page
-        Route::get('all-sliders/{slider}','SliderController@showResturant');  
+        Route::get('home','HomeController@home');                
+        Route::get('offers','HomeController@offers');   
+
+        Route::get('resturants','RestaurantController@index');    
+        Route::get('resturants/{id}','RestaurantController@show');  
 
 
         
@@ -45,7 +46,7 @@ Route::group(['namespace'=>'Api'],function(){
                 Route::put('profile/update',[AuthController::class,'updateProfile'])->name('users.updateProfile');
                 Route::post('logout',[AuthController::class,'logout']);
                 Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');
-                Route::get('resturants/add-fav/{Id}','HomeController@addToFav');                  
+                Route::get('resturants/add-fav/{Id}','RestaurantController@addToFav');                  
             });    
     
         });        

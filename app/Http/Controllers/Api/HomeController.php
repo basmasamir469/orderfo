@@ -23,7 +23,6 @@ class HomeController extends Controller
     {
 
         $sliders = Slider::latest()->get();
-
         $categories = Category::get();
 
         $categories = fractal()
@@ -33,46 +32,22 @@ class HomeController extends Controller
 
         $sliders = fractal()
             ->collection($sliders)
-            ->transformWith(new SliderTransformer('show'))
+            ->transformWith(new SliderTransformer())
             ->toArray();
 
         return $this->dataResponse(['sliders' => $sliders, 'categories' => $categories], 'all sliders', 200);
     }
 
-    public function resturants(Request $request)
-    {
+    public function offers(){
 
-        $resturants = Resturant::query();
-        $resturants = $resturants->search($resturants)->filter($resturants);
-        $resturants = $resturants->leftJoin('reviews', 'resturants.id', '=', 'reviews.resturant_id')
-            ->groupBy('resturants.id')
-            ->select('resturants.*', DB::raw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3, 1) as average_rating'))
-            ->orderBy('average_rating', 'DESC')
-            ->latest()
-            // ->skip(0)
-            // ->take(2)
-            ->get();
+        $sliders = Slider::latest()->get();
 
-        $resturants = fractal()
-            ->collection($resturants)
-            ->transformWith(new ResturantTransformer())
+        $sliders = fractal()
+            ->collection($sliders)
+            ->transformWith(new SliderTransformer('all_sliders'))
             ->toArray();
 
-
-        return $this->dataResponse(['resturants' => $resturants], 'all resturants', 200);
+        return $this->dataResponse(['sliders'=>$sliders], 'all sliders', 200);
     }
 
-    public function addToFav($resturant_id)
-    {
-
-        $resturant = Resturant::findOrFail($resturant_id);
-
-        $fav_rest = auth()->user()->favResturants()->toggle($resturant->id);
-
-        if (count($fav_rest['attached']) > 0) {
-
-            return $this->dataResponse(null, _('added successfully'), 200);
-        }
-        return $this->dataResponse(null, _('removed successfully'), 200);
-    }
 }

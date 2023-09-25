@@ -46,8 +46,8 @@ class SliderTransformer extends TransformerAbstract
             'image'=>$slider->image,
             'resturant_id'=>$slider->resturant?->id,
             'resturant_name'=>$slider->resturant?->name
-
         ];
+
         if($this->type=='all_sliders')
            {
             $array['resturant_images']=$slider->resturant?->images->map(function($image){

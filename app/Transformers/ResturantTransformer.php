@@ -52,8 +52,6 @@ class ResturantTransformer extends TransformerAbstract
             'is_offered' => $resturant->is_offered,
             'is_favourite' => $resturant->is_favourite,
             'status'=>$resturant->status
-
-            
         ];
 
 
@@ -68,11 +66,8 @@ class ResturantTransformer extends TransformerAbstract
             $array['description'] = $resturant->description;
             $array['vat'] = $resturant->vat;
             $array['category_id'] = $resturant->category_id;
+            $array['category_name'] = $resturant?->category?->name;
             $array['address'] = $resturant->address;
-
-
-
-
         }
 
         return $array;

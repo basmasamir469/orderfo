@@ -11,7 +11,13 @@ class Address extends Model
     public $timestamps = true;
     protected $guarded=[];
 
-
+    /**
+     * type
+     * 0 -> other 
+     * 1 -> home
+     * 2 -> work
+     */
+    
     public function user()
     {
         return $this->belongsTo('App\Models\User');
