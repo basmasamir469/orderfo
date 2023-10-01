@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Resturant;
 use App\Models\Review;
+use App\Models\Setting;
 use App\Models\Slider;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\ResturantTransformer;
+use App\Transformers\SettingTransformer;
 use App\Transformers\SliderTransformer;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
@@ -49,5 +51,13 @@ class HomeController extends Controller
 
         return $this->dataResponse(['sliders'=>$sliders], 'all sliders', 200);
     }
+
+    public function about(){
+
+        $settings=Setting::where('key','about_text')->first();
+
+        return $this->dataResponse(['settings'=>fractal($settings,new SettingTransformer('about'))->toArray()],'about page',200);
+    }
+
 
 }

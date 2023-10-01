@@ -2,10 +2,10 @@
 
 namespace App\Transformers;
 
-use App\Models\Category;
+use App\Models\Area;
 use League\Fractal\TransformerAbstract;
 
-class CategoryTransformer extends TransformerAbstract
+class AreaTransformer extends TransformerAbstract
 {
     private $type;
 
@@ -36,21 +36,21 @@ class CategoryTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform(Category $category)
+    public function transform(Area $area)
     {
-        $array=[
+        $array = [
             //
-            'id'=>$category->id,
-            'name'=>$category->name,
-            'logo'=>$category->logo
+            'id'=>$area->id,
+            'name'=>$area->name,
         ];
 
-        if($this->type=="dashboard"){
+        if($this->type =="dashboard"){
+            
             unset($array['name']);
-            $array['name_en']=$category->translate('en')->name;
-            $array['name_ar']=$category->translate('ar')->name;
+            $array['name_en']=$area->translate('en')->name;
+            $array['name_ar']=$area->translate('ar')->name;
         }
         return $array;
-
+            
     }
 }

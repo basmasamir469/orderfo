@@ -32,8 +32,16 @@ Route::group(['namespace'=>'Api'],function(){
         Route::get('offers','HomeController@offers');   
 
         Route::get('resturants','RestaurantController@index');    
-        Route::get('resturants/{id}','RestaurantController@show');  
+        Route::get('resturants/{id}','RestaurantController@show');
+        
+        Route::get('meals/{resturant_id}','MealController@index');    
+        Route::get('meals/{id}','MealController@show'); 
 
+        Route::get('resturants/{resturant_id}/reviews','RestaurantController@reviews');
+
+        Route::get('settings/about','HomeController@about');
+
+        Route::get('areas','AddressController@areas');   
 
         
 
@@ -46,7 +54,16 @@ Route::group(['namespace'=>'Api'],function(){
                 Route::put('profile/update',[AuthController::class,'updateProfile'])->name('users.updateProfile');
                 Route::post('logout',[AuthController::class,'logout']);
                 Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');
-                Route::get('resturants/add-fav/{Id}','RestaurantController@addToFav');                  
+
+                Route::get('resturants/add-fav/{Id}','RestaurantController@addToFav');
+                Route::get('myfavourite','RestaurantController@favResturants');
+                Route::post('resturants/{resturant_id}/reviews','RestaurantController@makeReview');
+
+                Route::get('addresses','AddressController@index');
+                Route::post('addresses','AddressController@store');
+                Route::put('addresses/{address}','AddressController@update');
+                Route::delete('addresses/{address}','AddressController@destroy');                                                    
+                
             });    
     
         });        

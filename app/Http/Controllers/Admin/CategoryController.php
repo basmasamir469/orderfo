@@ -21,7 +21,7 @@ class CategoryController extends Controller
 
         $categories = fractal()
             ->collection($categories)
-            ->transformWith(new CategoryTransformer())
+            ->transformWith(new CategoryTransformer('dashboard'))
             ->toArray();
 
         return $this->dataResponse($categories, 'all categories', 200);

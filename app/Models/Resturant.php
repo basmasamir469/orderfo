@@ -122,9 +122,9 @@ class Resturant extends Model implements TranslatableContract,HasMedia
     }
 
 
-    public function scopeSearch($q,$model){
+    public function scopeSearch($q){
 
-        $model->when(request('search'),function() use($q){
+        return $q->when(request('search'),function() use($q){
 
             return $q->whereTranslationLike('name', '%' . request('search') . '%')
             ->orWhere('description', 'like', '%' . request('search') . '%')
@@ -141,11 +141,11 @@ class Resturant extends Model implements TranslatableContract,HasMedia
     }
 
 
-    public function scopeFilter($q,$model){
+    public function scopeFilter($q){
 
         // sort by
 
-        $model->when(request('sort_by'),function() use($q){
+        self::query()->when(request('sort_by'),function() use($q){
 
           if(request('sort_by')=='a_to_z'){
                return $q->orderByTranslation('name','ASC');
@@ -200,14 +200,12 @@ class Resturant extends Model implements TranslatableContract,HasMedia
 
     }
 
-    public function scopeRate($q,$model){
+    public function scopeOrderByRate($q){
 
-     return $q->Join('reviews','reviews.resturant_id','=','resturants.id')
-     ->orderByRaw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) desc')
-     ->groupBy('reviews.resturant_id')
-     ->having('reviews.resturant_id',$this->id)
-     ->select('reviews.resturant_id');
-
+        return $q->leftJoin('reviews', 'resturants.id', '=', 'reviews.resturant_id')
+        ->groupBy('resturants.id')
+        ->select('resturants.*', DB::raw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3, 1) as average_rating'))
+        ->orderBy('average_rating', 'DESC');
     }
 
 

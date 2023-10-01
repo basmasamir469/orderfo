@@ -23,7 +23,7 @@ class SliderController extends Controller
 
         $sliders = fractal()
             ->collection($sliders)
-            ->transformWith(new SliderTransformer())
+            ->transformWith(new SliderTransformer('dashboard'))
             ->toArray();
 
         return $this->dataResponse(['sliders'=>$sliders], 'all sliders', 200);

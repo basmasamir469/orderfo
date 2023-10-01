@@ -21,4 +21,19 @@ class Governorate extends Model implements TranslatableContract
         return $this->hasMany('App\Models\Area');
     }
 
+    public function scopeSearch($q){
+
+        return $q->when(request('search'),function() use($q){
+
+            return $q->whereTranslationLike('name', '%' . request('search') . '%')
+
+            ->orWhereHas('areas',function($query){
+
+                return $query->whereTranslationLike('name', '%' . request('search') . '%');
+            });
+
+        });
+
+    }
+
 }

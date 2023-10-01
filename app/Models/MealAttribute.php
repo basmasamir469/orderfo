@@ -14,11 +14,54 @@ class MealAttribute extends Model implements TranslatableContract
     protected $table = 'meal_attributes';
     public $timestamps = true;
     protected $guarded=[];
+    // protected $casts = [
+    //     'size' => 'array',
+    //     'option'=>'array',
+    //     'extras'=>'array'
+    // ];
 
+    /*
+    type 
 
+    0 => individual
+    
+    1 => sharing_box
+
+    */
     public function meal()
     {
         return $this->belongsTo('App\Models\Meal');
     }
+
+    public function setSizeAttribute($size)
+    {
+        $this->attributes['size']=json_encode($size);
+    }
+  
+    public function setOptionAttribute($option)
+    {
+           $this->attributes['option']=json_encode($option);
+    } 
+        
+    public function setExtrasAttribute($extras)
+    {
+          $this->attributes['extras']=json_encode($extras);
+    } 
+    
+    public function getSizeAttribute()
+    {
+       return json_decode($this->attributes['size'],true);
+    }
+  
+    public function getOptionAttribute()
+    {
+        return json_decode($this->attributes['option'],true);
+    } 
+        
+    public function getExtrasAttribute()
+    {
+        return json_decode($this->attributes['extras'],true);
+
+    }    
 
 }

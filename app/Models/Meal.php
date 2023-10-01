@@ -19,11 +19,10 @@ class Meal extends Model implements TranslatableContract,HasMedia
     public $timestamps = true;
     protected $guarded=[];
 
-
-    public function meal_attributes()
-    {
-        return $this->hasMany('App\Models\MealAttribute');
-    }
+    // public function meal_attributes()
+    // {
+    //     return $this->hasMany('App\Models\MealAttribute');
+    // }
 
     public function resturant()
     {
@@ -41,7 +40,46 @@ class Meal extends Model implements TranslatableContract,HasMedia
     }
 
     public function getImageAttribute(){
+
         return $this->getFirstMediaUrl('meals-images');
+    }
+
+    public function meal_attributes()
+    {
+        return $this->hasOne('App\Models\MealAttribute');
+    }
+
+    public function scopeFilter($q)
+    {
+
+        return $q->when(request('filter_by'),function() use($q){
+
+          if(request('filter_by')=='top_offers'){
+            return $q->whereHas('meal_attributes',function($query){
+
+                return $query->whereNotNull('offer_price');
+             });
+
+          }
+          else if(request('filter_by') == 'most_selling'){
+
+             return self::Join('meal_order','meals.id','=','meal_order.meal_id')
+                        ->select('meal_order.meal_id','meals.*')
+                        ->groupBy('meal_order.meal_id')
+                        ->selectRaw('COUNT("meal_order.order_id") as orders_count')
+                        ->orderBy('orders_count','desc');
+
+          }
+          elseif(request('filter_by')=='sharing_box'){
+
+               return $q->whereHas('meal_attributes',function($q){
+
+                    return $q->where('type',1);
+               });
+          }
+
+        });
+
     }
 
 }

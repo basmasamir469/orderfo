@@ -19,7 +19,7 @@ class CreateAddressesTable extends Migration {
 			$table->integer('area_id')->unsigned();
 			$table->integer('type')->nullable()->default(0);
 			$table->string('building');
-			$table->string('additional_directions');
+			$table->string('additional_directions')->nullable();
 		});
 	}
 

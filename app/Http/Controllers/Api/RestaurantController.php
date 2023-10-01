@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\reviews\ReviewRequest;
 use App\Models\Category;
 use App\Models\Resturant;
 use App\Models\Review;
 use App\Models\Slider;
 use App\Transformers\CategoryTransformer;
 use App\Transformers\ResturantTransformer;
+use App\Transformers\ReviewTransformer;
 use App\Transformers\SliderTransformer;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
@@ -26,16 +28,14 @@ class RestaurantController extends Controller
         $take = $request->take ? $request->take : 10;
 
         $resturants = Resturant::query()
-            ->search($resturants)
-            ->filter($resturants)
-            ->leftJoin('reviews', 'resturants.id', '=', 'reviews.resturant_id')
-            ->groupBy('resturants.id')
-            ->select('resturants.*', DB::raw('ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3, 1) as average_rating'))
-            ->orderBy('average_rating', 'DESC');
+            ->search()
+            ->filter()
+            ->orderByRate()
+            ->skip($skip)
+            ->take($take)
+            ->get();
 
-        $count = $restaurants->count();
-        $restaurants = $restaurants->skip($skip)->take($take)->get();
-
+        $count = $resturants->count();
         $resturants = fractal()
             ->collection($resturants)
             ->transformWith(new ResturantTransformer())
@@ -50,8 +50,9 @@ class RestaurantController extends Controller
 
     public function show($id)
     {
-        $slider=Restaurant::findOrFail($id);
-        return $this->dataResponse(['resturant'=>fractal($slider->resturant,new ResturantTransformer('show'))->toArray()], 'resturant details', 200);
+        $resturant = Resturant::findOrFail($id);
+
+        return $this->dataResponse(['resturant'=>fractal($resturant,new ResturantTransformer('show'))->parseIncludes('payment_ways')->toArray()], 'resturant details', 200);
     }
 
     public function addToFav($resturant_id)
@@ -65,5 +66,73 @@ class RestaurantController extends Controller
             return $this->dataResponse(null, _('added successfully'), 200);
         }
         return $this->dataResponse(null, _('removed successfully'), 200);
+    }
+
+    public function favResturants()
+    {
+        $resturants=auth()->user()->favResturants;
+
+    if($resturants)
+      {
+        $resturants = fractal()
+        ->collection($resturants)
+        ->transformWith(new ResturantTransformer())
+        ->toArray();
+
+        return $this->dataResponse([
+            'resturants' => $resturants,
+        ], 'fav resturants', 200);    
+
+       }
+      return $this->dataResponse(null, 'there are no fav resturants', 200);    
+
+
+    }
+
+    public function makeReview(ReviewRequest $request,$resturant_id)
+    {
+         $data = $request->validated();
+
+         $resturant = Resturant::findOrFail($resturant_id);
+
+         $review = new Review();
+
+         $review->user_id = $request->user()->id;
+
+         $review->comment = $request->comment;
+
+         $review->order_packaging = $data['order_packaging'];
+
+         $review->delivery_time = $data['delivery_time'];
+
+         $review->value_of_money = $data['value_of_money'];
+
+         
+         $review = $resturant->reviews()->save($review);
+
+         if($review){
+
+            return $this->dataResponse(['review'=>fractal($review,new ReviewTransformer())->toArray()], 'added successfully', 200);
+
+         }
+
+    }
+
+    public function reviews(Request $request,$resturant_id){
+
+        $skip = $request->skip ? $request->skip : 0;
+        $take = $request->take ? $request->take : 10;
+
+
+        $resturant = Resturant::findOrFail($resturant_id);
+        $reviews = $resturant->reviews->skip($skip)->take($take);
+        $count = $resturant->reviews->count();
+        $reviews = fractal()
+            ->collection($reviews)
+            ->transformWith(new ReviewTransformer())
+            ->toArray();
+      
+            return $this->dataResponse(['reviews'=>$reviews,'count'=>$count], 'all reviews', 200);
+
     }
 }

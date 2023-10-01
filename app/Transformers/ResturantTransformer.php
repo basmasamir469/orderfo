@@ -70,6 +70,12 @@ class ResturantTransformer extends TransformerAbstract
             $array['address'] = $resturant->address;
         }
 
+        if($this->type=="dashboard"){
+            unset($array['name']);
+            $array['name_en']=$resturant->translate('en')->name;
+            $array['name_ar']=$resturant->translate('ar')->name;
+        }
+
         return $array;
 
     }

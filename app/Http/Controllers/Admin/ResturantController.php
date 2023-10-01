@@ -21,25 +21,23 @@ class ResturantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         //
-        $resturants = Resturant::with(['reviews'=>function($q){
+        $skip = $request->skip ? $request->skip : 0;
+        $take = $request->take ? $request->take : 10;
 
-            return $q->select('resturant_id')
-            ->groupBy('resturant_id')
-            ->orderByRaw("ROUND(( AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) DESC");
-             }])
-             ->latest()
-            ->skip($this->limit)
-            ->take(2)
+        $resturants = Resturant::query()
+            ->search()
+            ->filter()
+            ->orderByRate()
+            ->skip($skip)
+            ->take($take)
             ->get();
-
-        $this->limit +=2;
 
         $resturants = fractal()
         ->collection($resturants)
-        ->transformWith(new ResturantTransformer())
+        ->transformWith(new ResturantTransformer('dashboard'))
         ->toArray();
         
         return $this->dataResponse(['resturants'=>$resturants], 'all resturants', 200);
@@ -122,7 +120,7 @@ class ResturantController extends Controller
         //
         $resturant=Resturant::findOrFail($id);
 
-        return $this->dataResponse(fractal($resturant->fresh(),new ResturantTransformer('show'))->includePaymentWays()->toArray(),__('updated successfully'),200);
+        return $this->dataResponse(fractal($resturant,new ResturantTransformer('show'))->parseIncludes('payment_ways')->toArray(),__('resturant details'),200);
 
     }
 

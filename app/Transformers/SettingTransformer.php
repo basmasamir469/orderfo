@@ -2,12 +2,11 @@
 
 namespace App\Transformers;
 
-use App\Models\Resturant;
-use App\Models\Review;
-use Carbon\Carbon;
+use App\Models\Setting;
+use Illuminate\Support\Facades\App;
 use League\Fractal\TransformerAbstract;
 
-class ReviewTransformer extends TransformerAbstract
+class SettingTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
@@ -32,13 +31,13 @@ class ReviewTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform(Review $review)
+    public function transform(Setting $setting)
     {
         return [
-            'user_name'=>$review->user->fname.' '.$review->user->lname,
-            'date'=>Carbon::parse($review->created_at)->format('M d,Y'),
-            'comment'=>$review->comment,
-            'rate'=>$review->resturant->rate[0]->rate
+            //
+            'id'=>$setting->id,
+            'key'=>$setting->key,
+            'value'=>App::getLocale()=='en'?$setting->value['en']:$setting->value['ar']
         ];
     }
 }

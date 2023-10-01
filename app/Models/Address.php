@@ -23,9 +23,29 @@ class Address extends Model
         return $this->belongsTo('App\Models\User');
     }
 
+    public function area()
+    {
+        return $this->belongsTo('App\Models\Area');
+    }
+
     public function orders()
     {
         return $this->hasMany('App\Models\Order');
+    }
+    
+    public function getTypeAttribute()
+    {
+       if($this->attributes['type']==0)
+       {
+        return 'other';
+       }
+       else if($this->attributes['type']==1)
+       {
+        return 'Home';
+       }
+       else{
+        return 'Work';
+       }
     }
 
 }

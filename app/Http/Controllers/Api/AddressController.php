@@ -1,0 +1,154 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\addresses\AddressRequest;
+use App\Http\Requests\addresses\StoreAddressRequest;
+use App\Http\Requests\addresses\UpdateAddressRequest;
+use App\Models\Address;
+use App\Models\Governorate;
+use App\Transformers\AddressTransformer;
+use App\Transformers\GovernorateTransformer;
+use Illuminate\Http\Request;
+
+class AddressController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+        $addresses=auth()->user()->addresses;
+        $addresses = fractal()
+        ->collection($addresses)
+        ->transformWith(new AddressTransformer())
+        ->toArray();
+        return $this->dataResponse(['saved_places'=>$addresses],'saved_places',200);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreAddressRequest $request)
+    {
+        //
+        $data=$request->validated();
+
+        if($data['type'] == 2  || $data['type'] == 1){
+             
+            $address=Address::where('type',$data['type'])->first();
+
+            if($address){
+                return $this->dataResponse(fractal($address,new AddressTransformer('show'))->toArray(),__('already existed'),200);
+            }
+    
+        }
+        $address=Address::create([
+           'user_id'=>auth()->user()->id,
+           'name'=>$data['name'],
+           'street'=>$data['street'],
+           'type'=>$data['type'],
+           'latitude'=>$data['latitude'],
+           'longitude'=>$data['longitude'],
+           'building'=>$data['building'],
+           'area_id'=>$data['area_id'],
+           'additional_directions'=>$data['additional_directions']
+        ]);
+
+        if($address){
+    
+            return $this->dataResponse(fractal($address,new AddressTransformer('show'))->toArray(),__('stored successfully'),200);
+            }
+            return $this->dataResponse(null,__('failed to store'),500);    
+
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+        $address=Address::findOrFail($id);
+
+        return $this->dataResponse(fractal($address,new AddressTransformer('show'))->toArray(),__('address details'),200);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateAddressRequest $request, string $id)
+    {
+        //
+        $data=$request->validated();
+
+        $address=Address::findOrFail($id);
+           if($address->update([
+           'name'=>$data['name'],
+           'street'=>$data['street'],
+           'latitude'=>$data['latitude'],
+           'longitude'=>$data['longitude'],
+           'building'=>$data['building'],
+           'area_id'=>$data['area_id'],
+           'additional_directions'=>$data['additional_directions']
+        ])){
+    
+            return $this->dataResponse(fractal($address->fresh(),new AddressTransformer)->toArray(),__('updated successfully'),200);
+            }
+            return $this->dataResponse(null,__('failed to update'),500);    
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+        $address = Address::findOrFail($id);
+
+        if($address->delete()){
+
+            return $this->dataResponse(null,__('deleted successfully'),200);
+        }
+        return $this->dataResponse(null,__('failed to delete'),500);
+    }
+
+    public function areas(Request $request)
+    {
+                //
+        $skip = $request->skip ? $request->skip : 0;
+        $take = $request->take ? $request->take : 10;
+
+        $governorates = Governorate::query()
+            ->search()
+            ->skip($skip)
+            ->take($take)
+            ->get();
+
+        $governorates = fractal()
+        ->collection($governorates)
+        ->transformWith(new GovernorateTransformer())
+        ->includeAreas()
+        ->toArray();
+                
+        return $this->dataResponse(['governorates'=>$governorates], 'all areas', 200);        
+    }
+}

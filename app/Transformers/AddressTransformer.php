@@ -2,10 +2,10 @@
 
 namespace App\Transformers;
 
-use App\Models\Category;
+use App\Models\Address;
 use League\Fractal\TransformerAbstract;
 
-class CategoryTransformer extends TransformerAbstract
+class AddressTransformer extends TransformerAbstract
 {
     private $type;
 
@@ -13,6 +13,7 @@ class CategoryTransformer extends TransformerAbstract
     {
         $this->type = $type;
     }
+
     /**
      * List of resources to automatically include
      *
@@ -36,21 +37,24 @@ class CategoryTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform(Category $category)
+    public function transform(Address $address)
     {
-        $array=[
+        $array= [
             //
-            'id'=>$category->id,
-            'name'=>$category->name,
-            'logo'=>$category->logo
-        ];
+            'id'=>$address->id,
+            'type'=>$address->type,
+            'name'=>$address->name
 
-        if($this->type=="dashboard"){
-            unset($array['name']);
-            $array['name_en']=$category->translate('en')->name;
-            $array['name_ar']=$category->translate('ar')->name;
+        ];
+        if($this->type == 'show')
+        {
+            $array['building']=$address->building;
+            $array['street']=$address->street;
+            $array['area']=$address->area?->name;
+            $array['additional_directions']=$address->additional_directions;
+            $array['latitude']=$address->latitude;
+            $array['longitude']=$address->longitude;
         }
         return $array;
-
     }
 }
