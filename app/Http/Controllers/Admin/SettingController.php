@@ -21,7 +21,7 @@ class SettingController extends Controller
         if ($value instanceof UploadedFile) {
             $setting = Setting::where(['key' => $key])->first();
             $setting->clearMediaCollection('settings');
-            $setting->addMedia($value['ar'])->toMediaCollection('settings');
+            $setting->addMedia($value)->toMediaCollection('settings');
         } else {
             Setting::where(['key' => $key])->update(['value' => $value]);
         }
