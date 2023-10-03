@@ -11,15 +11,15 @@ use Illuminate\Http\Request;
 class MealController extends Controller
 {
     //
-    public function index(Request $request,$resturant_id)
+    public function index(Request $request)
     {
         $skip = $request->skip? $request->skip : 0;
         $take = $request->skip? $request->take : 10;
 
-        $meals= Resturant::findOrFail($resturant_id)
+        $meals= Resturant::findOrFail($request->resturant_id)
                 ->meals()
                 ->filter()
-                ->skip($skip)->take($take)
+                ->skip(12)->take($take)
                 ->get();
 
         $count=count($meals);
@@ -36,7 +36,7 @@ class MealController extends Controller
     {
        $meal=Meal::findOrFail($id);
 
-       return $this->dataResponse(['meal'=>fractal($meal,new MealTransformer('show'))->toArray()],'meal details',200);
+       return $this->dataResponse(['meal'=>fractal($meal,new MealTransformer())->parseIncludes('meal_attributes')->toArray()],'meal details',200);
     }
 
 

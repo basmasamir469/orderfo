@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('meal_attributes', function (Blueprint $table) {
+        Schema::table('meals', function (Blueprint $table) {
             //
-            $table->json('size');
-            $table->json('option');
-            $table->json('extras');
+            $table->integer('type')->default(0);
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('meal_attributes', function (Blueprint $table) {
+        Schema::table('meals', function (Blueprint $table) {
             //
         });
     }

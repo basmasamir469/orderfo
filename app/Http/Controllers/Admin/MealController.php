@@ -50,50 +50,49 @@ class MealController extends Controller
     public function store(StoreMealRequest $request)
     {
         //
-        $sizes=[];
-        $extras=[];
-        $options=[];
         $data=$request->validated();
-        foreach($data['sizes'] as $key => $size){
-            $sizes[]=
-            [
-                'size_en'=>$data['sizes'][$key]['en'],
-                'size_ar'=>$data['sizes'][$key]['ar'],
-                'size_price'=>$data['sizes'][$key]['price']
-            ];  
-        }
-
-        foreach($data['extras'] as $key => $extra){
-            $extras[]=
-            [
-                'extra_en'=>$data['extras'][$key]['en'],
-                'extra_ar'=>$data['extras'][$key]['ar'],
-                'extra_price'=>$data['extras'][$key]['price']
-            ];  
-        }
-
-        foreach($data['options'] as $key => $option){
-            $options[]=
-            [
-                'option_en'=>$data['options'][$key]['en'],
-                'option_ar'=>$data['options'][$key]['ar'],
-            ];  
-        }
-
         DB::beginTransaction();
+
         $meal=Meal::create([
             'en'=>['name'=>$data['name_en'],'description'=>$data['description_en']],
             'ar'=>['name'=>$data['name_ar'],'description'=>$data['description_ar']],
+            'type'=>$data['meal_type'],
             'resturant_id'=>$data['resturant_id'],
         ]);
-        $meal->meal_attributes()->create([
-         'type'=>$data['type'],
-         'price'=>$data['price'],
-         'offer_price'=>$data['offer_price'],
-         'size'=>$sizes,
-         'option'=>$options,
-         'extras'=>$extras
-        ]);
+        foreach($data['sizes'] as $key => $value){
+            $meal->meal_attributes()->create([
+                'en'=>['name'=>$data['sizes'][$key]['name_en']],
+                'ar'=>['name'=>$data['sizes'][$key]['name_ar']],
+                'type'=>0,
+                'price'=>$data['sizes'][$key]['price'],
+                'offer_price'=>$data['sizes'][$key]['offer_price'],
+               ]);
+       
+        }
+
+        foreach($data['extras'] as $key => $value){
+            $meal->meal_attributes()->create([
+                'en'=>['name'=>$data['extras'][$key]['name_en']],
+                'ar'=>['name'=>$data['extras'][$key]['name_ar']],
+                'type'=>1,
+                'price'=>$data['extras'][$key]['price'],
+                'offer_price'=>$data['extras'][$key]['offer_price'],
+               ]);
+       
+        }
+
+        foreach($data['options'] as $key => $value){
+            $meal->meal_attributes()->create([
+                'en'=>['name'=>$data['options'][$key]['name_en']],
+                'ar'=>['name'=>$data['options'][$key]['name_ar']],
+                'type'=>2,
+                'price'=>$data['options'][$key]['price']?$data['options'][$key]['price']:0.00,
+                'offer_price'=>$data['options'][$key]['offer_price'],
+               ]);
+       
+        }
+
+
         DB::commit();
 
         try{
@@ -109,7 +108,7 @@ class MealController extends Controller
     
             if($meal){
     
-            return $this->dataResponse(fractal($meal,new mealTransformer('show'))->toArray(),__('stored successfully'),200);
+            return $this->dataResponse(fractal($meal,new mealTransformer('dashboard'))->parseIncludes('meal_attributes')->toArray(),__('stored successfully'),200);
             }
             return $this->dataResponse(null,__('failed to store'),500);    
 
@@ -124,7 +123,7 @@ class MealController extends Controller
         //
         $meal=Meal::findOrFail($id);
 
-        return $this->dataResponse(fractal($meal,new MealTransformer('show'))->toArray(),__('meal details'),200);
+        return $this->dataResponse(fractal($meal,new MealTransformer('dashboard'))->parseIncludes('meal_attributes')->toArray(),__('meal details'),200);
     }
 
     /**
@@ -141,50 +140,21 @@ class MealController extends Controller
     public function update(StoreMealRequest $request, string $id)
     {
         //
-        $sizes=[];
-        $extras=[];
-        $options=[];
         $data=$request->validated();
-        foreach($data['sizes'] as $key => $size){
-            $sizes[]=
-            [
-                'size_en'=>$data['sizes'][$key]['en'],
-                'size_ar'=>$data['sizes'][$key]['ar'],
-                'size_price'=>$data['sizes'][$key]['price']
-            ];  
-        }
-
-        foreach($data['extras'] as $key => $extra){
-            $extras[]=
-            [
-                'extra_en'=>$data['extras'][$key]['en'],
-                'extra_ar'=>$data['extras'][$key]['ar'],
-                'extra_price'=>$data['extras'][$key]['price']
-            ];  
-        }
-
-        foreach($data['options'] as $key => $option){
-            $options[]=
-            [
-                'option_en'=>$data['options'][$key]['en'],
-                'option_ar'=>$data['options'][$key]['ar'],
-            ];  
-        }
-
         DB::beginTransaction();
         $meal=Meal::findOrFail($id);
         $meal=$meal->update([
             'en'=>['name'=>$data['name_en'],'description'=>$data['description_en']],
             'ar'=>['name'=>$data['name_ar'],'description'=>$data['description_ar']],
+            'type'=>$data['meal_type'],
             'resturant_id'=>$data['resturant_id'],
         ]);
         $meal->meal_attributes()->update([
-         'type'=>$data['type'],
+        'en'=>['name'=>$data['attribute_name_en']],
+        'ar'=>['name'=>$data['attribute_name_ar']],   
+         'type'=>$data['attr_type'],
          'price'=>$data['price'],
          'offer_price'=>$data['offer_price'],
-         'size'=>$sizes,
-         'option'=>$options,
-         'extras'=>$extras
         ]);
         DB::commit();
 
@@ -201,7 +171,7 @@ class MealController extends Controller
     
             if($meal){
     
-            return $this->dataResponse(fractal($meal,new mealTransformer('show'))->toArray(),__('updated successfully'),200);
+            return $this->dataResponse(fractal($meal,new mealTransformer('dashboard'))->parseIncludes('meal_attributes')->toArray(),__('updated successfully'),200);
             }
             return $this->dataResponse(null,__('failed to update'),500);    
 

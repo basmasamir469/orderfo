@@ -14,11 +14,6 @@ class MealAttribute extends Model implements TranslatableContract
     protected $table = 'meal_attributes';
     public $timestamps = true;
     protected $guarded=[];
-    // protected $casts = [
-    //     'size' => 'array',
-    //     'option'=>'array',
-    //     'extras'=>'array'
-    // ];
 
     /*
     type 
@@ -33,35 +28,23 @@ class MealAttribute extends Model implements TranslatableContract
         return $this->belongsTo('App\Models\Meal');
     }
 
-    public function setSizeAttribute($size)
-    {
-        $this->attributes['size']=json_encode($size);
-    }
-  
-    public function setOptionAttribute($option)
-    {
-           $this->attributes['option']=json_encode($option);
-    } 
-        
-    public function setExtrasAttribute($extras)
-    {
-          $this->attributes['extras']=json_encode($extras);
-    } 
-    
-    public function getSizeAttribute()
-    {
-       return json_decode($this->attributes['size'],true);
-    }
-  
-    public function getOptionAttribute()
-    {
-        return json_decode($this->attributes['option'],true);
-    } 
-        
-    public function getExtrasAttribute()
-    {
-        return json_decode($this->attributes['extras'],true);
+    public function getTypeAttribute(){
 
-    }    
+        if($this->attributes['type'] == 0){
+
+            return 'size';
+        }
+        else if($this->attributes['type'] == 1)
+        {
+            return 'extras';
+        }
+
+        else
+        {
+            return 'options';
+        }
+
+    }
+
 
 }

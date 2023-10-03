@@ -3,7 +3,9 @@
 namespace App\Transformers;
 
 use App\Models\Meal;
+use App\Models\MealAttribute;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use League\Fractal\TransformerAbstract;
 
 class MealTransformer extends TransformerAbstract
@@ -31,6 +33,7 @@ class MealTransformer extends TransformerAbstract
      */
     protected array $availableIncludes = [
         //
+        'meal_attributes'
     ];
     
     /**
@@ -40,43 +43,22 @@ class MealTransformer extends TransformerAbstract
      */
     public function transform(Meal $meal)
     {
+        $size_attributes=$meal->meal_attributes()->where('type',0)->get();
         $array= [
             //
             'id'=>$meal->id,
             'name'=>$meal->name,
             'description'=>$meal->description,
             'image'=>$meal->image,
-            'sizes'=>collect($meal->meal_attributes?->size)
-                    ->map(function($size){
-                        return [
-                            'size'=>App::getLocale()=='en'?$size['size_en']:$size['size_ar'],
-                            'price'=>$size['size_price']
-                        ];
-                    }),
-            'offer-price'=>$meal->meal_attributes?->offer_price,
-            'price'=>$meal->meal_attributes?->price,
-            'type'=>$meal->meal_attributes?->type,
+            'price'=>$size_attributes->map(function($attr){
+                return [
+                   $attr->name => $attr->offer_price != null || $attr->offer_price != 0.00 ?$attr->offer_price:$attr->price
+                ];
+            }),
+            'type'=>$meal->type,
             
         ];
 
-        if($this->type=='show'){
-
-            $array['extras']= collect($meal->meal_attributes?->extras)
-            ->map(function($extra){
-                return [
-                    'name'=>App::getLocale()=='en'?$extra['extra_en']:$extra['extra_ar'],
-                    'price'=>$extra['extra_price']
-                ];
-            });
-
-            $array['option']= collect($meal->meal_attributes?->option)
-            ->map(function($option){
-                return [
-                    'option'=>App::getLocale()=='en'?$option['option_en']:$option['option_ar'],
-                ];
-            });
-
-        }
         if($this->type=="dashboard"){
             unset($array['name']);
             unset($array['description']);
@@ -88,4 +70,12 @@ class MealTransformer extends TransformerAbstract
 
         return $array;
     }
+
+    public function includeMealAttributes(Meal $meal)
+    {
+       $meal_attributes = $meal->meal_attributes;
+
+       return $this->collection($meal_attributes, new MealAttributeTransformer()); 
+    }
+
 }

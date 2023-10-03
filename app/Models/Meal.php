@@ -19,10 +19,19 @@ class Meal extends Model implements TranslatableContract,HasMedia
     public $timestamps = true;
     protected $guarded=[];
 
-    // public function meal_attributes()
-    // {
-    //     return $this->hasMany('App\Models\MealAttribute');
-    // }
+        /*
+    type 
+
+    0 => individual
+    
+    1 => sharing_box
+
+    */
+
+     public function meal_attributes()
+     {
+         return $this->hasMany('App\Models\MealAttribute');
+     }
 
     public function resturant()
     {
@@ -42,11 +51,6 @@ class Meal extends Model implements TranslatableContract,HasMedia
     public function getImageAttribute(){
 
         return $this->getFirstMediaUrl('meals-images');
-    }
-
-    public function meal_attributes()
-    {
-        return $this->hasOne('App\Models\MealAttribute');
     }
 
     public function scopeFilter($q)
@@ -72,14 +76,24 @@ class Meal extends Model implements TranslatableContract,HasMedia
           }
           elseif(request('filter_by')=='sharing_box'){
 
-               return $q->whereHas('meal_attributes',function($q){
-
-                    return $q->where('type',1);
-               });
+               return $q->where('type',1);
           }
 
         });
 
     }
+
+    public function getTypeAttribute(){
+
+        if($this->attributes['type'] == 0){
+
+            return 'individual';
+        }
+        else if($this->attributes['type'] == 1)
+        {
+            return 'sharing_box';
+        }
+    }
+
 
 }
