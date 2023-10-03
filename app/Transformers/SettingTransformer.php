@@ -35,7 +35,7 @@ class SettingTransformer extends TransformerAbstract
     {
         return [
             //
-            'id'=>$setting->id,
+            // 'id'=>$setting->id,
             'key'=>$setting->key,
             'value'=>App::getLocale()=='en'?$setting->value['en']:$setting->value['ar']
         ];

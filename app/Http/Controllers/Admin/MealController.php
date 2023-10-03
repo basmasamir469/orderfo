@@ -49,7 +49,6 @@ class MealController extends Controller
      */
     public function store(StoreMealRequest $request)
     {
-        //
         $data=$request->validated();
         DB::beginTransaction();
 
@@ -91,26 +90,10 @@ class MealController extends Controller
                ]);
        
         }
-
-
+        $meal->addMedia($data['image'])->toMediaCollection('meals-images');
         DB::commit();
 
-        try{
-
-            $meal->addMedia($data['image'])
-    
-            ->toMediaCollection('meals-images');
-            }
-            catch(\Exception $e){
-    
-                return $this->dataResponse(null,__('failed to store'),500);
-            }
-    
-            if($meal){
-    
-            return $this->dataResponse(fractal($meal,new mealTransformer('dashboard'))->parseIncludes('meal_attributes')->toArray(),__('stored successfully'),200);
-            }
-            return $this->dataResponse(null,__('failed to store'),500);    
+        return $this->dataResponse(null,__('stored successfully'),200);    
 
 
     }
@@ -139,7 +122,6 @@ class MealController extends Controller
      */
     public function update(StoreMealRequest $request, string $id)
     {
-        //
         $data=$request->validated();
         DB::beginTransaction();
         $meal=Meal::findOrFail($id);
@@ -156,24 +138,15 @@ class MealController extends Controller
          'price'=>$data['price'],
          'offer_price'=>$data['offer_price'],
         ]);
-        DB::commit();
 
-        try{
-            $meal->clearMediaCollection('meals-images');
+        $meal->clearMediaCollection('meals-images');
             $meal->addMedia($data['image'])
     
             ->toMediaCollection('meals-images');
-            }
-            catch(\Exception $e){
+
+        DB::commit();
     
-                return $this->dataResponse(null,__('failed to update'),500);
-            }
-    
-            if($meal){
-    
-            return $this->dataResponse(fractal($meal,new mealTransformer('dashboard'))->parseIncludes('meal_attributes')->toArray(),__('updated successfully'),200);
-            }
-            return $this->dataResponse(null,__('failed to update'),500);    
+        return $this->dataResponse(null,__('updated successfully'),200);    
 
     }
 

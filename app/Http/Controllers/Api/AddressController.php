@@ -49,7 +49,7 @@ class AddressController extends Controller
             $address=Address::where('type',$data['type'])->first();
 
             if($address){
-                return $this->dataResponse(fractal($address,new AddressTransformer('show'))->toArray(),__('already existed'),200);
+                return $this->dataResponse(null,__('already existed'),422);
             }
     
         }
@@ -65,12 +65,7 @@ class AddressController extends Controller
            'additional_directions'=>$data['additional_directions']
         ]);
 
-        if($address){
-    
-            return $this->dataResponse(fractal($address,new AddressTransformer('show'))->toArray(),__('stored successfully'),200);
-            }
-            return $this->dataResponse(null,__('failed to store'),500);    
-
+        return $this->dataResponse(null,__('stored successfully'),200);
     }
 
     /**
@@ -80,7 +75,6 @@ class AddressController extends Controller
     {
         //
         $address=Address::findOrFail($id);
-
         return $this->dataResponse(fractal($address,new AddressTransformer('show'))->toArray(),__('address details'),200);
     }
 
@@ -97,23 +91,21 @@ class AddressController extends Controller
      */
     public function update(UpdateAddressRequest $request, string $id)
     {
-        //
         $data=$request->validated();
-
         $address=Address::findOrFail($id);
-           if($address->update([
-           'name'=>$data['name'],
-           'street'=>$data['street'],
-           'latitude'=>$data['latitude'],
-           'longitude'=>$data['longitude'],
-           'building'=>$data['building'],
-           'area_id'=>$data['area_id'],
-           'additional_directions'=>$data['additional_directions']
-        ])){
+        $address->update(
+            [
+               'name'       => $data['name']      ?? $address->name,
+               'street'     => $data['street']    ?? $address->street,
+               'latitude'   => $data['latitude']  ?? $address->latitude,
+               'longitude'  => $data['longitude'] ?? $address->longitude,
+               'building'   => $data['building']  ?? $address->building,
+               'area_id'    => $data['area_id']   ?? $address->area_id,
+               'additional_directions' => $data['additional_directions'] ?? $address->additional_directions
+            ]
+        );
     
-            return $this->dataResponse(fractal($address->fresh(),new AddressTransformer)->toArray(),__('updated successfully'),200);
-            }
-            return $this->dataResponse(null,__('failed to update'),500);    
+        return $this->dataResponse(null,__('updated successfully'),200);     
     }
 
     /**
@@ -121,19 +113,17 @@ class AddressController extends Controller
      */
     public function destroy(string $id)
     {
-        //
         $address = Address::findOrFail($id);
 
         if($address->delete()){
 
             return $this->dataResponse(null,__('deleted successfully'),200);
         }
-        return $this->dataResponse(null,__('failed to delete'),500);
+        return $this->dataResponse(null,__('failed to delete'),422);
     }
 
     public function areas(Request $request)
     {
-                //
         $skip = $request->skip ? $request->skip : 0;
         $take = $request->take ? $request->take : 10;
 

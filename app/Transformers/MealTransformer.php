@@ -49,14 +49,14 @@ class MealTransformer extends TransformerAbstract
             'id'=>$meal->id,
             'name'=>$meal->name,
             'description'=>$meal->description,
-            'image'=>$meal->image,
+            'image'=>$meal->getFirstMediaUrl('meals-images'),
             'price'=>$size_attributes->map(function($attr){
                 return [
-                   $attr->name => $attr->offer_price != null || $attr->offer_price != 0.00 ?$attr->offer_price:$attr->price
+                    ($attr->offer_price != null || $attr->offer_price != 0.00) ? $attr->offer_price : $attr->price
                 ];
             }),
             'type'=>$meal->type,
-            
+
         ];
 
         if($this->type=="dashboard"){
@@ -74,8 +74,7 @@ class MealTransformer extends TransformerAbstract
     public function includeMealAttributes(Meal $meal)
     {
        $meal_attributes = $meal->meal_attributes;
-
-       return $this->collection($meal_attributes, new MealAttributeTransformer()); 
+       return $this->collection($meal_attributes, new MealAttributeTransformer($this->type ?? '')); 
     }
 
 }

@@ -19,7 +19,7 @@ class MealController extends Controller
         $meals= Resturant::findOrFail($request->resturant_id)
                 ->meals()
                 ->filter()
-                ->skip(12)->take($take)
+                ->skip($skip)->take($take)
                 ->get();
 
         $count=count($meals);

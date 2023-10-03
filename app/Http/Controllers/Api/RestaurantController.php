@@ -71,51 +71,46 @@ class RestaurantController extends Controller
     public function favResturants()
     {
         $resturants=auth()->user()->favResturants;
-
-    if($resturants)
-      {
         $resturants = fractal()
-        ->collection($resturants)
-        ->transformWith(new ResturantTransformer())
-        ->toArray();
+            ->collection($resturants)
+            ->transformWith(new ResturantTransformer())
+            ->toArray();
 
         return $this->dataResponse([
             'resturants' => $resturants,
         ], 'fav resturants', 200);    
 
-       }
-      return $this->dataResponse(null, 'there are no fav resturants', 200);    
-
-
     }
 
     public function makeReview(ReviewRequest $request,$resturant_id)
     {
-         $data = $request->validated();
+        $data = $request->validated();
+        $resturant = Resturant::findOrFail($resturant_id);
+        //  $review = new Review();
+        $item = [
+           'user_id'          => $request->user()->id,
+           'comment'          => $data['comment'],
+           'order_packaging'  => $data['order_packaging'],
+           'delivery_time'    => $data['delivery_time'],
+           'value_of_money'   => $data['value_of_money'],
+        ];
+        $resturant->reviews()->create($item);
 
-         $resturant = Resturant::findOrFail($resturant_id);
+        //  Review::create($item);
 
-         $review = new Review();
+        //  $review->user_id = $request->user()->id;
 
-         $review->user_id = $request->user()->id;
+        //  $review->comment = $request->comment;
 
-         $review->comment = $request->comment;
+        //  $review->order_packaging = $data['order_packaging'];
 
-         $review->order_packaging = $data['order_packaging'];
+        //  $review->delivery_time = $data['delivery_time'];
 
-         $review->delivery_time = $data['delivery_time'];
-
-         $review->value_of_money = $data['value_of_money'];
+        //  $review->value_of_money = $data['value_of_money'];
 
          
-         $review = $resturant->reviews()->save($review);
-
-         if($review){
-
-            return $this->dataResponse(['review'=>fractal($review,new ReviewTransformer())->toArray()], 'added successfully', 200);
-
-         }
-
+        //  $review = $resturant->reviews()->save($review);
+        return $this->dataResponse(null, 'added successfully', 200);
     }
 
     public function reviews(Request $request,$resturant_id){

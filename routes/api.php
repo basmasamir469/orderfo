@@ -60,6 +60,7 @@ Route::group(['namespace'=>'Api'],function(){
                 Route::post('resturants/{resturant_id}/reviews','RestaurantController@makeReview');
 
                 Route::get('addresses','AddressController@index');
+                Route::get('addresses/{id}','AddressController@show');
                 Route::post('addresses','AddressController@store');
                 Route::put('addresses/{address}','AddressController@update');
                 Route::delete('addresses/{address}','AddressController@destroy');                                                    

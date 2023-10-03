@@ -41,9 +41,7 @@ class GovernorateTransformer extends TransformerAbstract
      */
     public function transform(Governorate $governorate)
     {
-            //
             $array=[
-                //
                 'id'=>$governorate->id,
                 'name'=>$governorate->name,
             ];
@@ -61,6 +59,6 @@ class GovernorateTransformer extends TransformerAbstract
     {
        $areas = $governorate->areas;
 
-       return $this->collection($areas, new AreaTransformer()); 
+       return $this->collection($areas, new AreaTransformer($this->type ?? '')); 
     }
 }
