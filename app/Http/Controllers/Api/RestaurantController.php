@@ -89,7 +89,7 @@ class RestaurantController extends Controller
         //  $review = new Review();
         $item = [
            'user_id'          => $request->user()->id,
-           'comment'          => $data['comment'],
+           'comment'          => $request->comment,
            'order_packaging'  => $data['order_packaging'],
            'delivery_time'    => $data['delivery_time'],
            'value_of_money'   => $data['value_of_money'],

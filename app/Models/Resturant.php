@@ -70,13 +70,10 @@ class Resturant extends Model implements TranslatableContract,HasMedia
         
         return DB::table('resturants')
         ->leftJoin('reviews','reviews.resturant_id','=','resturants.id')
-        ->select(DB::raw("ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) AS rate"))
+        ->select('resturants.*',DB::raw("ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) AS rate"))
         ->groupBy('resturants.id')
         ->having('resturants.id','=',$this->id)
         ->get();
-        //  return $this->whereHas('reviews',function($q){
-        //    return round(($q->avg('order_packaging') + $q->avg('delivery_time') + $q->avg('value_of_money')) / count($this->reviews),1);
-        //  })->get();
     }
 
     public function getIsOfferedAttribute()
