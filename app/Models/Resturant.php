@@ -66,14 +66,20 @@ class Resturant extends Model implements TranslatableContract,HasMedia
         return $this->getMedia('resturants-images');
     }
 
-    public function getRateAttribute(){
+    public function getRateAttribute()
+    {
         
-        return DB::table('resturants')
-        ->leftJoin('reviews','reviews.resturant_id','=','resturants.id')
-        ->select('resturants.*',DB::raw("ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) AS rate"))
-        ->groupBy('resturants.id')
-        ->having('resturants.id','=',$this->id)
-        ->get();
+         $rate = ($this->reviews->avg('order_packaging') + $this->reviews->avg('value_of_money') + $this->reviews->avg('delivery_time')) /3 ;
+         
+         return  number_format((float) $rate, 1, '.', '') ?? 0 ;
+
+        // return DB::table('resturants')
+        // ->leftJoin('reviews','reviews.resturant_id','=','resturants.id')
+        // ->select('resturants.*',DB::raw("ROUND((AVG(reviews.order_packaging) + AVG(reviews.delivery_time) + AVG(reviews.value_of_money)) / 3,1) AS rate"))
+        // ->groupBy('resturants.id')
+        // ->having('resturants.id','=',$this->id)
+        // ->get();
+
     }
 
     public function getIsOfferedAttribute()

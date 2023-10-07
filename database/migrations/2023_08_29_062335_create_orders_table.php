@@ -17,7 +17,6 @@ class CreateOrdersTable extends Migration {
 			$table->decimal('subtotal');
 			$table->decimal('total_cost');
 			$table->integer('payment_status');
-			$table->string('payment_way');
 			$table->integer('address_id')->unsigned();
 			$table->decimal('delivery_fee');
 			$table->string('delivery_time');

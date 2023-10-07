@@ -64,16 +64,6 @@ class CreateForeignKeys extends Migration {
 						->onDelete('cascade')
 						->onUpdate('cascade');
 		});
-		Schema::table('cart_items', function(Blueprint $table) {
-			$table->foreign('meal_id')->references('id')->on('meals')
-						->onDelete('cascade')
-						->onUpdate('cascade');
-		});
-		Schema::table('cart_items', function(Blueprint $table) {
-			$table->foreign('cart_id')->references('id')->on('carts')
-						->onDelete('cascade')
-						->onUpdate('cascade');
-		});
 		Schema::table('orders', function(Blueprint $table) {
 			$table->foreign('user_id')->references('id')->on('users')
 						->onDelete('cascade')

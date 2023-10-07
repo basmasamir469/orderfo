@@ -27,7 +27,7 @@ class StoreMealRequest extends FormRequest
             'name_ar'=>'required',
             'description_en'=>'required',
             'description_ar'=>'required',
-            'image'=>'required',
+            'images'=>'required',
             'meal_type'=>'required|in:0,1',
             'sizes'=>'required|array',
             'sizes.*.name_en'=>'required',

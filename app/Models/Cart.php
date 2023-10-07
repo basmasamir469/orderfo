@@ -17,9 +17,15 @@ class Cart extends Model
         return $this->belongsTo('App\Models\User');
     }
 
-    public function cartItems()
+    // public function cartItems()
+    // {
+    //     return $this->hasMany('App\Models\CartItem');
+    // }
+
+    public function meals()
     {
-        return $this->hasMany('App\Models\CartItem');
+        return $this->belongsToMany('App\Models\Meal','cart_meal','cart_id','meal_id')->using(CartMeal::class)
+        ->withPivot('quantity','size','extras','option','meal_price','special_instructions');
     }
 
 }

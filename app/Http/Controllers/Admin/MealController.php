@@ -90,7 +90,10 @@ class MealController extends Controller
                ]);
        
         }
-        $meal->addMedia($data['image'])->toMediaCollection('meals-images');
+        // $meal->addMedia($data['image'])->toMediaCollection('meals-images');
+        foreach($data['images'] as $image){
+            $meal->addMedia($image)->toMediaCollection('meals-images');
+        }
         DB::commit();
 
         return $this->dataResponse(null,__('stored successfully'),200);    
@@ -140,10 +143,10 @@ class MealController extends Controller
         ]);
 
         $meal->clearMediaCollection('meals-images');
-            $meal->addMedia($data['image'])
-    
-            ->toMediaCollection('meals-images');
-
+        
+        foreach($data['images'] as $image){
+            $meal->addMedia($image)->toMediaCollection('meals-images');
+        }
         DB::commit();
     
         return $this->dataResponse(null,__('updated successfully'),200);    

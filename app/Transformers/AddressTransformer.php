@@ -54,6 +54,7 @@ class AddressTransformer extends TransformerAbstract
             $array['additional_directions']=$address->additional_directions;
             $array['latitude']=$address->latitude;
             $array['longitude']=$address->longitude;
+            $array['floor']=$address->floor;
         }
         return $array;
     }

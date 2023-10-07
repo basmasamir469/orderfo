@@ -39,14 +39,7 @@ class ReviewTransformer extends TransformerAbstract
             'user_name'=>$review->user->fname.' '.$review->user->lname,
             'date'=>Carbon::parse($review->created_at)->format('M d,Y'),
             'comment'=>$review->comment,
-            'rate'=> number_format(((float)$review->avg('order_packaging') + (float)$review->avg('delivery_time') +(float)$review->avg('value_of_money'))/3, 1, '.', '') 
-
-            // $review->resturant->rate->map(function($r){
-            //     return 
-            //     [
-            //         $r->rate
-            //     ];
-            // }),
+            'rate'=> number_format(((float)$review->order_packaging +$review->value_of_money +$review->delivery_time)/3 , 1 , "." ,"")?? 0
         ];
     }
 }

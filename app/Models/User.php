@@ -67,12 +67,12 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany('App\Models\Address');
     }
 
-    public function carts()
+    public function cart()
     {
-        return $this->hasMany('App\Models\Cart');
+        return $this->hasOne('App\Models\Cart');
     }
 
-    public function order()
+    public function orders()
     {
         return $this->hasMany('App\Models\Order');
     }

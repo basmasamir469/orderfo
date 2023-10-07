@@ -41,7 +41,8 @@ Route::group(['namespace'=>'Api'],function(){
 
         Route::get('settings/about','HomeController@about');
 
-        Route::get('areas','AddressController@areas');   
+        Route::get('areas','AddressController@areas');
+           
 
         
 
@@ -57,13 +58,22 @@ Route::group(['namespace'=>'Api'],function(){
 
                 Route::get('resturants/add-fav/{Id}','RestaurantController@addToFav');
                 Route::get('myfavourite','RestaurantController@favResturants');
-                Route::post('resturants/{resturant_id}/reviews','RestaurantController@makeReview');
 
                 Route::get('addresses','AddressController@index');
                 Route::get('addresses/{id}','AddressController@show');
                 Route::post('addresses','AddressController@store');
                 Route::put('addresses/{address}','AddressController@update');
-                Route::delete('addresses/{address}','AddressController@destroy');                                                    
+                Route::delete('addresses/{address}','AddressController@destroy');
+                
+                Route::post('orders/{order_id}/reviews','OrderController@makeReview');
+                Route::get('my-orders','OrderController@myOrders');
+                Route::get('my-orders/{id}','OrderController@orderDetails');
+                Route::post('orders','OrderController@makeOrder');
+
+                Route::post('mycart/{meal_id}','CartController@addToCart');
+                Route::get('mycart','CartController@myCart');
+                Route::delete('mycart/clear','CartController@clearCart');
+
                 
             });    
     

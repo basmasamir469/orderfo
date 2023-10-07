@@ -30,6 +30,7 @@ class StoreAddressRequest extends FormRequest
             'longitude'=>'required',
             'building'=>'required',
             'area_id'=>'required',
+            'floor'=>'required',
             'additional_directions'=> 'nullable' 
         ];
     }
