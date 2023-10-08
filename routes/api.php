@@ -70,7 +70,7 @@ Route::group(['namespace'=>'Api'],function(){
                 Route::get('my-orders/{id}','OrderController@orderDetails');
                 Route::post('orders','OrderController@makeOrder');
 
-                Route::post('mycart/{meal_id}','CartController@addToCart');
+                Route::post('add-to-cart','CartController@addToCart');
                 Route::get('mycart','CartController@myCart');
                 Route::delete('mycart/clear','CartController@clearCart');
 

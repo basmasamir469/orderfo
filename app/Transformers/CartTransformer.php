@@ -66,7 +66,7 @@ class CartTransformer extends TransformerAbstract
 
             'delivery-fee' => $resturant->delivery_fee,
 
-            'total' => ($cart->total_price  * $resturant->vat) + ($cart->total_price + $resturant->delivery_fee ) 
+            'total' => (($cart->total_price  * $resturant->vat)/100) + $cart->total_price + $resturant->delivery_fee 
 
 
 

@@ -14,9 +14,9 @@ class CreateCartMealTable extends Migration {
 			$table->timestamps();
 			$table->integer('meal_id')->unsigned();
 			$table->json('size');
-			$table->json('option');
-			$table->json('extras');
-			$table->decimal('meal_price');
+			$table->json('option')->nullable();
+			$table->json('extras')->nullable();
+			$table->decimal('meal_price')->nullable();
 			$table->string('quantity');
 			$table->text('special_instructions')->nullable();
 			$table->integer('cart_id')->unsigned();
