@@ -14,7 +14,7 @@ class CreateMealAttributesTable extends Migration {
 			$table->timestamps();
 			$table->integer('meal_id')->unsigned();
 			$table->integer('type')->default('0');
-			$table->decimal('price');
+			$table->decimal('price')->nullable();
 			$table->decimal('offer_price')->nullable();
 		});
 	}

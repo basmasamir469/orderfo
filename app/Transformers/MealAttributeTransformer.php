@@ -45,6 +45,12 @@ class MealAttributeTransformer extends TransformerAbstract
             'type'=>$attr->type,
             'name'=>$attr->name,
             'price'=>$attr->price ?  $attr->price : $attr->offer_price,
+            'meal_images' => $attr->meal?->images?->map(function($image){
+                return[
+                  'url'=>$image->getUrl()
+                ];
+            })
+
             
         ];
 

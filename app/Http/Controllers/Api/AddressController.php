@@ -62,6 +62,7 @@ class AddressController extends Controller
            'longitude'=>$data['longitude'],
            'building'=>$data['building'],
            'area_id'=>$data['area_id'],
+           'floor' =>$data['floor'],
            'additional_directions'=>$data['additional_directions']
         ]);
 
@@ -89,7 +90,7 @@ class AddressController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAddressRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
         $data=$request->validated();
         $address=Address::findOrFail($id);
@@ -101,6 +102,7 @@ class AddressController extends Controller
                'longitude'  => $data['longitude'] ?? $address->longitude,
                'building'   => $data['building']  ?? $address->building,
                'area_id'    => $data['area_id']   ?? $address->area_id,
+               'floor'      => $data['floor']     ?? $address->floor,
                'additional_directions' => $data['additional_directions'] ?? $address->additional_directions
             ]
         );

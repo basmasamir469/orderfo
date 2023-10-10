@@ -14,6 +14,7 @@ class CreateAddressesTable extends Migration {
 			$table->timestamps();
 			$table->string('name');
 			$table->string('street');
+			$table->integer('floor');
 			$table->text('latitude');
 			$table->text('longitude');
 			$table->integer('area_id')->unsigned();

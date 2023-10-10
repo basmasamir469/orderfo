@@ -38,20 +38,41 @@ class Meal extends Model implements TranslatableContract,HasMedia
         return $this->belongsTo('App\Models\Resturant');
     }
 
-    public function cartItem()
+    // public function cartItem()
+    // {
+    //     return $this->belongsTo('App\Models\CartItem');
+    // }
+
+    public function carts()
     {
-        return $this->belongsTo('App\Models\CartItem');
+
+        return $this->belongsToMany('App\Models\Cart','cart_meal','meal_id','cart_id')->using(CartMeal::class)
+        ->withPivot('quantity','size','extras','option','meal_price','special_instructions');
+
     }
 
     public function orders()
     {
         return $this->belongsToMany('App\Models\Order');
     }
+    public function getSizeAttribute(){
 
-    public function getImageAttribute(){
+        return json_decode($this->pivot->size,true);
+   
+      }   
 
-        return $this->getFirstMediaUrl('meals-images');
-    }
+   public function getExtrasAttribute(){
+
+     return  json_decode($this->pivot->extras,true);
+
+   }
+
+   public function getOptionAttribute(){
+
+    return  json_decode($this->pivot->option,true);
+
+  }
+
 
     public function scopeFilter($q)
     {

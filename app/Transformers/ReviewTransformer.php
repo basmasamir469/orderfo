@@ -35,10 +35,11 @@ class ReviewTransformer extends TransformerAbstract
     public function transform(Review $review)
     {
         return [
+            'id'=>$review->id,
             'user_name'=>$review->user->fname.' '.$review->user->lname,
             'date'=>Carbon::parse($review->created_at)->format('M d,Y'),
             'comment'=>$review->comment,
-            'rate'=>$review->resturant->rate[0]->rate
+            'rate'=> number_format(((float)$review->order_packaging +$review->value_of_money +$review->delivery_time)/3 , 1 , "." ,"")?? 0
         ];
     }
 }

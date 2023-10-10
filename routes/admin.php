@@ -30,11 +30,18 @@ Route::group(['namespace'=>'Admin'],function(){
         Route::delete('meals/{meal}','MealController@destroy')->name('meals.destroy');
 
         
-        Route::get('areas/{governorate_id}','AreaController@index')->name('areas.index');
+        Route::get('areas','AreaController@index')->name('areas.index');
         Route::get('areas/{area}','AreaController@show')->name('areas.show');
         Route::post('areas','AreaController@store')->name('areas.store');
         Route::put('areas/{area}','AreaController@update')->name('areas.update');
         Route::delete('areas/{area}','AreaController@destroy')->name('areas.destroy');
+
+
+        Route::get('orders','OrderController@index')->name('orders.index');
+        Route::get('orders/{order}','OrderController@show')->name('orders.show');
+        Route::post('orders/accept/{order}','OrderController@acceptOrder')->name('orders.accept');
+        Route::post('orders/reject/{order}','OrderController@rejectOrder')->name('orders.reject');
+        Route::post('orders/out-for-delivery/{order}','OrderController@outForDelivery')->name('orders.outForDelivery');
 
         Route::put('settings/about','SettingController@update')->name('settings.update');
 

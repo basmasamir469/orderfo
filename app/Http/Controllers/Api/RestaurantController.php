@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\reviews\ReviewRequest;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Resturant;
 use App\Models\Review;
 use App\Models\Slider;
@@ -82,36 +83,6 @@ class RestaurantController extends Controller
 
     }
 
-    public function makeReview(ReviewRequest $request,$resturant_id)
-    {
-        $data = $request->validated();
-        $resturant = Resturant::findOrFail($resturant_id);
-        //  $review = new Review();
-        $item = [
-           'user_id'          => $request->user()->id,
-           'comment'          => $data['comment'],
-           'order_packaging'  => $data['order_packaging'],
-           'delivery_time'    => $data['delivery_time'],
-           'value_of_money'   => $data['value_of_money'],
-        ];
-        $resturant->reviews()->create($item);
-
-        //  Review::create($item);
-
-        //  $review->user_id = $request->user()->id;
-
-        //  $review->comment = $request->comment;
-
-        //  $review->order_packaging = $data['order_packaging'];
-
-        //  $review->delivery_time = $data['delivery_time'];
-
-        //  $review->value_of_money = $data['value_of_money'];
-
-         
-        //  $review = $resturant->reviews()->save($review);
-        return $this->dataResponse(null, 'added successfully', 200);
-    }
 
     public function reviews(Request $request,$resturant_id){
 

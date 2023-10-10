@@ -13,7 +13,7 @@ class AreaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request,$governorate_id)
+    public function index(Request $request)
     {
         //
         $skip = $request->skip ? $request->skip : 0;
