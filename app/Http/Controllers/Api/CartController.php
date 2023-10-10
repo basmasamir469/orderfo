@@ -19,9 +19,12 @@ class CartController extends Controller
         $user_cart = (auth()->user()->cart) ? auth()->user()->cart : auth()->user()->cart()->create(['total_price'=>0.00]) ;
         
         // check if meals in cart belong to the same resturant
-        if($user_cart->meals()->first()?->resturant_id != $meal->resturant_id)
+        if(count($user_cart->meals) > 0 )
         {
-            return $this->dataResponse(null,__('cannot added to cart ,meals must belong to one resturant '),422);
+          if($user_cart->meals()->first()?->resturant_id != $meal->resturant_id)
+            {
+                return $this->dataResponse(null,__('cannot added to cart ,meals must belong to one resturant '),422);
+            }
         }
 
         // add meal to cart
@@ -43,9 +46,9 @@ class CartController extends Controller
     {
         $cart = auth()->user()->cart;
         $cart_price  = 0;
-        foreach($cart->meals->get() as $cart_meal)
+        foreach($cart->meals as $cart_meal)
         {
-            $meal = Meal::findOrFail($cart_meal->meal_id);
+            $meal = Meal::findOrFail($cart_meal->pivot->meal_id);
             $size_attr = $meal->meal_attributes()->where('id',$cart_meal->pivot->size)->first();
             $size_price = (is_null($size_attr?->offer_price)) ? $size_attr?->price : $size_attr?->offer_price;
             $extras_attr = $meal->meal_attributes()->where('id',$cart_meal->pivot->extras)->first();
@@ -63,11 +66,18 @@ class CartController extends Controller
 
     public function clearCart()
     {
-       if(auth()->user()->cart->meals()->detach() && auth()->user()->cart()->update(['total_price' =>0.00]))
-       {
+      if(count(auth()->user()->cart->meals) > 0)
+      {
+         if(auth()->user()->cart->meals()->detach() && auth()->user()->cart()->update(['total_price' =>0.00]))
+              {
 
-        return $this->dataResponse( null ,__('cleared successfully'),200);
+                return $this->dataResponse( null ,__('cleared successfully'),200);
 
-       }
+              }
+      }
+
+     return $this->dataResponse( null ,__('there are no meals in cart'),422);
+
+
     }
 }

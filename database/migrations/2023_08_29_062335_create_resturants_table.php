@@ -20,7 +20,7 @@ class CreateResturantsTable extends Migration {
 			$table->decimal('delivery_fee');
 			$table->integer('delivery_time');
 			$table->text('description');
-			$table->decimal('vat');
+			$table->integer('vat');
 			$table->integer('category_id')->unsigned();
 			$table->string('address');
 		});

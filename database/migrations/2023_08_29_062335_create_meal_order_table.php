@@ -15,8 +15,8 @@ class CreateMealOrderTable extends Migration {
 			$table->integer('meal_id')->unsigned();
 			$table->integer('order_id')->unsigned();
 			$table->json('size');
-			$table->json('option');
-			$table->json('extras');
+			$table->json('option')->nullable();
+			$table->json('extras')->nullable();
 			$table->text('special_instructions')->nullable();
 			$table->string('quantity');
 			$table->decimal('meal_price');

@@ -13,7 +13,7 @@ class CreateCartsTable extends Migration {
 			$table->increments('id');
 			$table->timestamps();
 			$table->BigInteger('user_id')->unsigned();
-			$table->decimal('total_price');
+			$table->decimal('total_price')->nullable();
 		});
 	}
 
