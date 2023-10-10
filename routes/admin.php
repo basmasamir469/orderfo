@@ -2,7 +2,7 @@
 use Illuminate\Support\Facades\Route;
 
 
-Route::group(['namespace'=>'Admin'],function(){
+Route::group(['namespace'=>'Api\Admin'],function(){
 
     Route::group(['prefix'=>'v1','middleware'=>['auth:sanctum','role:admin']],function(){
 

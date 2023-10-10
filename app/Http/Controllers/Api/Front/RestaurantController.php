@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Front;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\reviews\ReviewRequest;
@@ -88,7 +88,6 @@ class RestaurantController extends Controller
 
         $skip = $request->skip ? $request->skip : 0;
         $take = $request->take ? $request->take : 10;
-
 
         $resturant = Resturant::findOrFail($resturant_id);
         $reviews = $resturant->reviews->skip($skip)->take($take);

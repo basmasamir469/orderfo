@@ -42,37 +42,27 @@ class OrderTransformer extends TransformerAbstract
         $array = [
 
             'id' => $order->id,
-
             'resturant-logo' => $order->resturant->getFirstMediaUrl('resturants-logos'),
-
             'resturant-name '=> $order->resturant->name,
-
             'total_price'    => $order->total_cost,
-
             'order_date'     => $order->created_at,
-
             'meals_count'    => $order->meals->sum('pivot.quantity'),
-
             'status'         => $order->status
         ];
 
         if ($this->type == 'show') {
 
             $array['resturant-description'] = $order->resturant->description;
-
             $array['delivery_address'] = [
 
                 'id' => $order->address->id,
-
                 'name' => $order->address->street,
-
                 'floor' => $order->address->floor
 
             ];
 
             $array['meals'] = $order->meals->map(function ($meal) {
                 return [
-
                     'id'   => $meal->id,
                     'image' => $meal->getFirstMediaUrl('meals-images'),
                     'name' => $meal->name,
