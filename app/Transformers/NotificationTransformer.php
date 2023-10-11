@@ -34,11 +34,12 @@ class NotificationTransformer extends TransformerAbstract
     public function transform(Notification $notification)
     {
         return [
-
+            'id' => $notification->id,
             'title'  => $notification->title,
             'content'=> $notification->content,
             'date'   => Carbon::parse($notification->created_at)->diffForHumans(),
-            'order_id' => $notification->action_id
+            'action_id' => $notification->action_id,
+            'action' => $notification->action
 
               ];
     }

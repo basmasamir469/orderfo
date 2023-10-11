@@ -57,17 +57,14 @@ class OrderController extends Controller
 
             DB::commit();
 
-            $title = $notification->translate('en')->title;
-
-            $body = $notification->translate('en')->content;
-            
-            $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
-            
+            $tokens = Token::where('user_id',$order->user_id)->pluck('token')->toArray();
             $data=[
-                'order_id'=>$order->id
+                'title'    => $notification->translate('en')->title,
+                'body'     => $notification->translate('en')->content,
+                'action_id'=> $notification->action_id
             ];
 
-             $this->notifyByFirebase($title,$body,$tokens,$data);
+             $this->notifyByFirebase($tokens,$data);
 
             return $this->dataResponse(null,__('order is cooking now'),200);  
         }
@@ -92,23 +89,19 @@ class OrderController extends Controller
               $notification=$order->user->notifications()->create([
                 'en'=>['title'=>'order is cancelled','content'=>'your order is cancelled !'],
                 'ar'=>['title'=>'تم الغاء طلبك','content'=>' للاسف تم الغاء طلبك'],
-                'action'=>'Reject',
+                'action'=>'reject',
                 'action_id'=>$order->id
             ]);
 
             DB::commit();
-
-            $title = $notification->translate('en')->title;
-
-            $body = $notification->translate('en')->content;
-            
             $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
-            
             $data=[
-                'order_id'=>$order->id
+                'title'    => $notification->translate('en')->title,
+                'body'     => $notification->translate('en')->content,
+                'action_id'=> $notification->action_id
             ];
 
-             $this->notifyByFirebase($title,$body,$tokens,$data);
+             $this->notifyByFirebase($tokens,$data);
 
             return $this->dataResponse(null,__('order is rejected '),200);    
         }
@@ -130,23 +123,20 @@ class OrderController extends Controller
               $notification=$order->user->notifications()->create([
                 'en'=>['title'=>'order is out for delivery','content'=>'your order is in the way !'],
                 'ar'=>['title'=>'تم توصيل طلبك','content'=>'  طلبك في الطريق !'],
-                'action'=>'out for delivery',
+                'action'=>'out',
                 'action_id'=>$order->id
             ]);
 
             DB::commit();
-
-            $title = $notification->translate('en')->title;
-
-            $body = $notification->translate('en')->content;
-            
             $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
-            
+           
             $data=[
-                'order_id'=>$order->id
+                'title'    => $notification->translate('en')->title,
+                'body'     => $notification->translate('en')->content,
+                'action_id'=> $notification->action_id
             ];
 
-             $this->notifyByFirebase($title,$body,$tokens,$data);
+             $this->notifyByFirebase($tokens,$data);
  
               
             return $this->dataResponse(null,__('order is in the way!'),200);

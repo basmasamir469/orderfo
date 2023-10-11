@@ -259,29 +259,38 @@ public function submitToken(TokenRequest $request)
 
   $data  = $request->validated();
 
-//   $request->user()->token()->updateOrCreate([
-//     'device_id'   => $data['device_id']
-//    ],[
+//   $request->user()->tokens()->first()->updateOrCreate([
+//     'device_id'   => $data['device_id'],
 //     'token'       => $data['token'],
 //     'device_type' => $data['device_type']
 //    ]);
-   $token = Token::where('device_id',$data['device_id'])->first();
-   if($token)
-    {
-     $token->Update([
-        'token'       => $data['token'],
-        'user_id'     => auth()->user()->id
-      ]);
-    }
-   else
-    {
-    $request->user()->token()->Create([
-     'device_id'   => $data['device_id'],
-     'token'       => $data['token'],
-     'device_type' => $data['device_type']
-    ]);
 
-    }
+   $token = Token::updateOrCreate(
+        ['device_id' => $data['device_id']],
+        [
+            'user_id'     => $request->user()->id,
+            'token'       => $data['token'],
+            'device_type' => $data['device_type']
+        ]
+    );
+
+//    $token = Token::where('device_id',$data['device_id'])->first();
+//    if($token)
+//     {
+//      $token->update([
+//         'token'       => $data['token'],
+//         'user_id'     => auth()->user()->id
+//       ]);
+//     }
+//    else
+//     {
+//     $request->user()->tokens()->create([
+//      'device_id'   => $data['device_id'],
+//      'token'       => $data['token'],
+//      'device_type' => $data['device_type']
+//     ]);
+
+    // }
 
     return $this->dataResponse(null,__('submitted successfully'),200);
 

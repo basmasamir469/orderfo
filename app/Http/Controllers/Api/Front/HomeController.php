@@ -73,7 +73,11 @@ class HomeController extends Controller
         ->transformWith(new NotificationTransformer())
         ->toArray();
 
-         return $this->dataResponse([$notifications,$count], 'your notifications', 200);
+        return $this->dataResponse([
+            'notifications' => $notifications,
+            'count' => $count
+        ], 'your notifications', 200);
+
 
     }
 

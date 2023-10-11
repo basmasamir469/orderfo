@@ -81,8 +81,8 @@ class User extends Authenticatable implements HasMedia
         return $this->getFirstMediaUrl('users-images');
     }
 
-    public function token(){
-        return $this->hasOne('App\Models\Token');
+    public function tokens(){
+        return $this->hasMany('App\Models\Token');
     }
 
     public function notifications()
