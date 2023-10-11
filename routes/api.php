@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Front\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +54,7 @@ Route::group(['namespace'=>'Api\Front'],function(){
                 Route::get('profile',[AuthController::class,'getProfile'])->name('users.profile');
                 Route::put('profile/update',[AuthController::class,'updateProfile'])->name('users.updateProfile');
                 Route::post('logout',[AuthController::class,'logout']);
+                Route::post('submit-token',[AuthController::class,'submitToken']);
                 Route::post('profile/image',[AuthController::class,'uploadImage'])->name('users.imageProfile');
 
                 Route::get('resturants/add-fav/{Id}','RestaurantController@addToFav');
@@ -73,6 +74,8 @@ Route::group(['namespace'=>'Api\Front'],function(){
                 Route::post('add-to-cart','CartController@addToCart');
                 Route::get('mycart','CartController@myCart');
                 Route::delete('mycart/clear','CartController@clearCart');
+
+                Route::get('notifications','HomeController@notifications');
 
                 
             });    

@@ -32,7 +32,7 @@ class MealController extends Controller
         ->transformWith(new MealTransformer('dashboard'))
         ->toArray();
 
-        return $this->dataResponse(['meals'=>$meals],'meals of resturants',200);
+        return $this->dataResponse($meals,'meals of resturants',200);
 
     }
 

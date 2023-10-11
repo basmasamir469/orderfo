@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Token;
 use App\Transformers\OrderTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -38,11 +40,34 @@ class OrderController extends Controller
 
         if($order->order_status == Order::PENDING)
         {
+            DB::beginTransaction();
+
             $order->update([
 
                 'order_status' => Order::APPROVED
       
               ]);
+            
+            $notification=$order->user->notifications()->create([
+                'en'=>['title'=>'order is accepted','content'=>'your order is cooking now!'],
+                'ar'=>['title'=>'تم قبول طلبك','content'=>'يتم تجهيز طلبك الان !'],
+                'action'=>'accept',
+                'action_id'=>$order->id
+            ]);
+
+            DB::commit();
+
+            $title = $notification->translate('en')->title;
+
+            $body = $notification->translate('en')->content;
+            
+            $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
+            
+            $data=[
+                'order_id'=>$order->id
+            ];
+
+             $this->notifyByFirebase($title,$body,$tokens,$data);
 
             return $this->dataResponse(null,__('order is cooking now'),200);  
         }
@@ -57,11 +82,33 @@ class OrderController extends Controller
 
         if($order->order_status == Order::PENDING || $order->order_status == Order::APPROVED)
         {
+            DB::beginTransaction();
+
             $order->update([
 
                 'order_status' => Order::CANCELLED
       
               ]);
+              $notification=$order->user->notifications()->create([
+                'en'=>['title'=>'order is cancelled','content'=>'your order is cancelled !'],
+                'ar'=>['title'=>'تم الغاء طلبك','content'=>' للاسف تم الغاء طلبك'],
+                'action'=>'Reject',
+                'action_id'=>$order->id
+            ]);
+
+            DB::commit();
+
+            $title = $notification->translate('en')->title;
+
+            $body = $notification->translate('en')->content;
+            
+            $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
+            
+            $data=[
+                'order_id'=>$order->id
+            ];
+
+             $this->notifyByFirebase($title,$body,$tokens,$data);
 
             return $this->dataResponse(null,__('order is rejected '),200);    
         }
@@ -74,12 +121,33 @@ class OrderController extends Controller
 
         if($order->order_status == Order::APPROVED)
         {
-
+            Db::beginTransaction();
             $order->update([
 
                 'order_status' => Order::OUTFORDELIVERY
       
-              ]); 
+              ]);
+              $notification=$order->user->notifications()->create([
+                'en'=>['title'=>'order is out for delivery','content'=>'your order is in the way !'],
+                'ar'=>['title'=>'تم توصيل طلبك','content'=>'  طلبك في الطريق !'],
+                'action'=>'out for delivery',
+                'action_id'=>$order->id
+            ]);
+
+            DB::commit();
+
+            $title = $notification->translate('en')->title;
+
+            $body = $notification->translate('en')->content;
+            
+            $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
+            
+            $data=[
+                'order_id'=>$order->id
+            ];
+
+             $this->notifyByFirebase($title,$body,$tokens,$data);
+ 
               
             return $this->dataResponse(null,__('order is in the way!'),200);
 

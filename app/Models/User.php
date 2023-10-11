@@ -76,8 +76,18 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany('App\Models\Order');
     }
-    public function getProfileImageAttribute(){
+    public function getProfileImageAttribute()
+    {
         return $this->getFirstMediaUrl('users-images');
+    }
+
+    public function token(){
+        return $this->hasOne('App\Models\Token');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany('App\Models\Notification');
     }
 
 }

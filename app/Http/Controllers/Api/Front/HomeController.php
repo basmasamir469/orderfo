@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Models\Setting;
 use App\Models\Slider;
 use App\Transformers\CategoryTransformer;
+use App\Transformers\NotificationTransformer;
 use App\Transformers\ResturantTransformer;
 use App\Transformers\SettingTransformer;
 use App\Transformers\SliderTransformer;
@@ -49,14 +50,31 @@ class HomeController extends Controller
             ->transformWith(new SliderTransformer('all_sliders'))
             ->toArray();
 
-        return $this->dataResponse(['sliders'=>$sliders], 'all sliders', 200);
+        return $this->dataResponse($sliders, 'all sliders', 200);
     }
 
     public function about(){
 
-        $settings=Setting::where('key','about_text')->first();
+        $settings = Setting::where('key','about_text')->first();
 
-        return $this->dataResponse(['settings'=>fractal($settings,new SettingTransformer('about'))->toArray()],'about page',200);
+        return $this->dataResponse(fractal($settings,new SettingTransformer('about'))->toArray(),'about page',200);
+    }
+
+    public function notifications(Request $request)
+    {
+        $skip = $request->skip? $request->skip : 0;
+        $take = $request->skip? $request->take : 10;
+        $notifications = auth()->user()->notifications;
+        $count = count($notifications);
+        $notifications = $notifications->skip($skip)
+                                       ->take($take);
+        $notifications = fractal()
+        ->collection($notifications)
+        ->transformWith(new NotificationTransformer())
+        ->toArray();
+
+         return $this->dataResponse([$notifications,$count], 'your notifications', 200);
+
     }
 
 

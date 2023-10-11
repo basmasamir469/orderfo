@@ -9,10 +9,12 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\SendResetPasswordCodeRequest;
+use App\Http\Requests\TokenRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Mail\ForgetPassword;
 use App\Mail\VerifyEmail;
 use App\Models\ActivationProcess;
+use App\Models\Token;
 use App\Models\User;
 use App\Transformers\UserTransformer;
 use Carbon\Carbon;
@@ -24,6 +26,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
@@ -34,7 +37,8 @@ public function register(RegisterRequest $request){
     $data['password'] = Hash::make($request->password);
     DB::beginTransaction();
     $user = User::create($data);
-    $user->assignRole('user');
+    $role = Role::where(['name'=>'user','guard_name'=>'api'])->first();
+    $user->assignRole($role);
 
     $code = rand(11111,99999);
     ActivationProcess::create([
@@ -248,6 +252,41 @@ public function uploadImage(Request $request){
         return $this->dataResponse(null, 'image uploaded successfully',200);
     }
     return $this->dataResponse(null, 'something wrong is happened !failed to upload image',500);
+}
+
+public function submitToken(TokenRequest $request)
+{
+
+  $data  = $request->validated();
+
+//   $request->user()->token()->updateOrCreate([
+//     'device_id'   => $data['device_id']
+//    ],[
+//     'token'       => $data['token'],
+//     'device_type' => $data['device_type']
+//    ]);
+   $token = Token::where('device_id',$data['device_id'])->first();
+   if($token)
+    {
+     $token->Update([
+        'token'       => $data['token'],
+        'user_id'     => auth()->user()->id
+      ]);
+    }
+   else
+    {
+    $request->user()->token()->Create([
+     'device_id'   => $data['device_id'],
+     'token'       => $data['token'],
+     'device_type' => $data['device_type']
+    ]);
+
+    }
+
+    return $this->dataResponse(null,__('submitted successfully'),200);
+
+  
+
 }
 
 }

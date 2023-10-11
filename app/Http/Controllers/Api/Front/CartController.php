@@ -46,22 +46,27 @@ class CartController extends Controller
     {
         $cart = auth()->user()->cart;
         $cart_price  = 0;
-        foreach($cart->meals as $cart_meal)
-        {
-            $meal = Meal::findOrFail($cart_meal->pivot->meal_id);
-            $size_attr = $meal->meal_attributes()->where('id',$cart_meal->pivot->size)->first();
-            $size_price = (is_null($size_attr?->offer_price)) ? $size_attr?->price : $size_attr?->offer_price;
-            $extras_attr = $meal->meal_attributes()->where('id',$cart_meal->pivot->extras)->first();
-            $extra_price = (is_null($extras_attr?->offer_price)) ? $extras_attr?->price : $extras_attr?->offer_price;
-
-            $cart_price += ($cart_meal->pivot->quantity * ($size_price + $extra_price));
-        }
-
-        $cart->update([
+       if(count($cart->meals) > 0)
+         {
+           foreach($cart->meals as $cart_meal)
+           {
+               $meal = Meal::findOrFail($cart_meal->pivot->meal_id);
+               $size_attr = $meal->meal_attributes()->where('id',$cart_meal->pivot->size)->first();
+               $size_price = (is_null($size_attr?->offer_price)) ? $size_attr?->price : $size_attr?->offer_price;
+               $extras_attr = $meal->meal_attributes()->where('id',$cart_meal->pivot->extras)->first();
+               $extra_price = (is_null($extras_attr?->offer_price)) ? $extras_attr?->price : $extras_attr?->offer_price;
+   
+               $cart_price += ($cart_meal->pivot->quantity * ($size_price + $extra_price));
+           }
+           $cart->update([
             'total_price'=> $cart_price 
-        ]);
+           ]);
 
-        return $this->dataResponse( ['my-cart'=> fractal( $cart , new CartTransformer )->toArray()] ,'mycart details',200);
+          return $this->dataResponse( ['my-cart'=> fractal( $cart , new CartTransformer )->toArray()] ,'mycart details',200);
+
+         }
+         return $this->dataResponse( null ,'there are no meals in cart',200);
+
     }
 
     public function clearCart()
@@ -70,9 +75,7 @@ class CartController extends Controller
       {
          if(auth()->user()->cart->meals()->detach() && auth()->user()->cart()->update(['total_price' =>0.00]))
               {
-
-                return $this->dataResponse( null ,__('cleared successfully'),200);
-
+               return $this->dataResponse( null ,__('cleared successfully'),200);
               }
       }
 
