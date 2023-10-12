@@ -18,6 +18,7 @@ use App\Models\Setting;
                 // 'to' => $token,
                 // 'topic'  => 'offer',
                 'priority' => 'high',
+                "content_available"=> true,
                 'notification' => $fcmMsg,
                 'data' => $data
             );
@@ -26,6 +27,9 @@ use App\Models\Setting;
                 'registration_ids' => $tokens,
                 'priority' => 'high',
                 "content_available"=> true,
+                "aps" =>[
+                    "content-available"=>"1"
+                ],
                 'data' => $data
             );
             $firebase_key=Setting::where('key','firebase_access_key')->first()?->value['en'];

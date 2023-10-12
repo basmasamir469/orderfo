@@ -71,10 +71,8 @@ class ConversationController extends Controller
                         ->toMediaCollection('messages-images');
         }
         $tokens = Token::where('user_id',$request->user_id)->pluck('token')->toArray();
-        $data=[
-          'silent'=>true
-        ];
-        $this->notifyByFirebase($tokens,$data,"silent");
+        
+        $this->notifyByFirebase($tokens,[],"silent");
         return $this->dataResponse(null,'message sent successfully',200);
     }
 }

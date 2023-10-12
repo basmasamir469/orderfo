@@ -17,13 +17,16 @@ class ConversationController extends Controller
         $skip = $request->skip? $request->skip : 0;
         $take = $request->skip? $request->take : 10;
         $conversations = $request->user()->conversations()
-                                         ->search()
-                                         ->skip($skip)
-                                         ->take($take)
-                                         ->orderBy('updated_at','desc')
-                                         ->get();
+        ->whereHas('messages')
+        ->search();
 
-        $count =count($request->user()->conversations);
+        $count = $conversations->count();
+        $conversations = $conversations->skip($skip)
+            ->take($take)
+            ->orderBy('updated_at','desc')
+            ->get();
+
+        
         $conversations = fractal()
         ->collection($conversations)
         ->transformWith(new ConversationTransformer())
@@ -46,10 +49,11 @@ class ConversationController extends Controller
     public function sendMessage(Request $request)
     {
         DB::beginTransaction();
-        $conversation = Conversation::where(['user_id'=>$request->user()->id,'resturant_id' =>$request->resturant_id])->first()?? 
-                        Conversation::create([
-                           'user_id'=>$request->user()->id,
-                           'resturant_id'=>$request->resturant_id ]);
+        $conversation = Conversation::where(['user_id'=>$request->user()->id,'resturant_id' =>$request->resturant_id])->first() ?? 
+            Conversation::create([
+                'user_id'=>$request->user()->id,
+                'resturant_id'=>$request->resturant_id 
+            ]);
 
        $message= $conversation->messages()->create([
                'text'=>$request->text,
@@ -68,10 +72,8 @@ class ConversationController extends Controller
                         ->toMediaCollection('messages-images');
         }
         $tokens = Token::where('resturant_id',$request->resturant_id)->pluck('token')->toArray();
-        $data=[
-          'silent'=>true
-        ];
-        $this->notifyByFirebase($tokens,$data,"silent");
+        
+        $this->notifyByFirebase($tokens,[],"silent");
         return $this->dataResponse(null,'message sent successfully',200);
     }
 }

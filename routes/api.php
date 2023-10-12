@@ -77,8 +77,8 @@ Route::group(['namespace'=>'Api\Front'],function(){
 
                 Route::get('notifications','HomeController@notifications');
 
-                Route::get('my-conversations','ConversationController@index');
-                Route::get('my-conversations/{id}','ConversationController@show');
+                Route::get('conversations','ConversationController@index');
+                Route::get('conversations/{id}','ConversationController@show');
                 Route::post('messages','ConversationController@sendMessage');
 
                 

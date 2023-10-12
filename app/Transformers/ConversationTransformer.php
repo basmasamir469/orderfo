@@ -36,12 +36,11 @@ class ConversationTransformer extends TransformerAbstract
         $last_message = $conversation->messages()->latest()->first();
         $array= [
             'id' => $conversation->id,
-            'sender_name' =>auth()->user()->hasRole('resturant')? $conversation->user->fname :$conversation->resturant->name,
+            'sender_name' =>auth()->user()->hasRole('resturant')? $conversation->user->fname : $conversation->resturant->name,
             'sender_logo' =>auth()->user()->hasRole('resturant')? $conversation->user->getFirstMediaUrl('users-images') :$conversation->resturant->getFirstMediaUrl('resturants-logos'),
             'is_muted'=>$conversation->is_muted,
             'last_message_date'=>$conversation->last_message_date,
-            'last_message'=>$last_message->text != null? $last_message->text : $last_message->getFirstMediaUrl('message-images'),
-            'is_read'=>$last_message->is_read
+            'last_message'=> $last_message->text != null? $last_message->text : $last_message->getFirstMediaUrl('message-images'),
         ];
 
         return $array;
