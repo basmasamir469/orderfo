@@ -53,7 +53,7 @@ class RestaurantController extends Controller
     {
         $resturant = Resturant::findOrFail($id);
 
-        return $this->dataResponse(['resturant'=>fractal($resturant,new ResturantTransformer('show'))->parseIncludes('payment_ways')->toArray()], 'resturant details', 200);
+        return $this->dataResponse(['resturant'=>fractal($resturant,new ResturantTransformer('show'))->parseIncludes(['payment_ways','meals'])->toArray()], 'resturant details', 200);
     }
 
     public function addToFav($resturant_id)

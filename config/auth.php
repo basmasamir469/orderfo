@@ -44,6 +44,11 @@ return [
         'api'=>[
             'driver' => 'token',
             'provider' => 'users',
+        ],
+
+        'resturant-api'=>[
+            'driver' => 'token',
+            'provider' => 'resturants',
         ]
     ],
 
@@ -68,6 +73,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        'resturants' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Resturant::class,
         ],
 
         // 'users' => [

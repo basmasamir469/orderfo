@@ -4,6 +4,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['namespace'=>'Api\Admin'],function(){
 
+    Route::post('resturants/login','ResturantController@login');
+    
+    Route::group(['middleware'=>['auth:sanctum','role:resturant'],'prefix'=>'v1'],function(){
+        Route::get('resturant/conversations','ConversationController@index');
+        Route::get('resturant/conversations/{id}','ConversationController@show');
+        Route::post('resturant/messages','ConversationController@sendMessage');
+    
+    });
+    
     Route::group(['prefix'=>'v1','middleware'=>['auth:sanctum','role:admin']],function(){
 
         Route::get('categories','CategoryController@index')->name('categories.index');

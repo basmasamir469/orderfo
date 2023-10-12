@@ -90,4 +90,9 @@ class User extends Authenticatable implements HasMedia
         return $this->hasMany('App\Models\Notification');
     }
 
+    public function conversations()
+    {
+        return $this->hasMany('App\Models\Conversation');
+    }
+
 }

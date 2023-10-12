@@ -31,7 +31,7 @@ class ResturantTransformer extends TransformerAbstract
      */
     protected array $availableIncludes = [
         //
-        'payment_ways'
+        'payment_ways','meals'
     ];
     
     /**
@@ -46,7 +46,6 @@ class ResturantTransformer extends TransformerAbstract
             'name'=>$resturant->name,
             'delivery_time'=>$resturant->delivery_time,
             'logo'=>$resturant->logo,
-            'image'=>$resturant->getFirstMediaUrl(),
             'reviews'=>$resturant->rate,
             'count_reviews'=>count($resturant->reviews),
             'is_offered' => $resturant->is_offered,
@@ -68,6 +67,11 @@ class ResturantTransformer extends TransformerAbstract
             $array['category_id'] = $resturant->category_id;
             $array['category_name'] = $resturant?->category?->name;
             $array['address'] = $resturant->address;
+            $array['resturant_images']=$resturant->images->map(function($image){
+                return[
+                  'url'=>$image->getUrl()
+                ];
+            });
         }
 
         if($this->type=="dashboard"){
@@ -85,6 +89,13 @@ class ResturantTransformer extends TransformerAbstract
          $payment_ways = $resturant->paymentWays;
 
          return $this->collection($payment_ways, new PaymentWayTransformer()); 
+      }
+
+      public function includeMeals(Resturant $resturant)
+      {
+         $meals = $resturant->meals;
+
+         return $this->collection($meals, new MealTransformer()); 
       }
 
 }

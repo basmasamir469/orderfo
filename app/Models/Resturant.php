@@ -5,15 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
-use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
 
 
-class Resturant extends Model implements TranslatableContract,HasMedia
+class Resturant extends Authenticatable implements TranslatableContract,HasMedia
 {
-    use Translatable,InteractsWithMedia;
+    use Translatable,InteractsWithMedia,HasApiTokens,HasRoles;
     
     public $translatedAttributes = ['name'];
     protected $table = 'resturants';
@@ -55,6 +57,12 @@ class Resturant extends Model implements TranslatableContract,HasMedia
 
         return $this->belongsToMany(PaymentWay::class,'payment_way_resturant','resturant_id','payment_way_id');
     }
+
+    public function conversations()
+    {
+        return $this->hasMany('App\Models\Conversation');
+    }
+
 
     public function getLogoAttribute(){
 

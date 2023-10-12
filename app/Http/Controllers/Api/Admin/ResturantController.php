@@ -11,9 +11,11 @@ use App\Models\Slider;
 use App\Transformers\ResturantTransformer;
 use App\Transformers\SliderTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
+use Spatie\Permission\Models\Role;
 
 class ResturantController extends Controller
 {
@@ -215,4 +217,21 @@ class ResturantController extends Controller
         return $this->dataResponse(null,__('failed to delete'),500);
 
     }
+
+    public function login(Request $request){
+
+         $resturant=Resturant::where(['latitude'=>$request->latitude,'longitude'=>$request->longitude])->first();
+         if($resturant){       
+                   $resturant->assignRole(Role::where('name','resturant')->first());
+                   $token= $resturant->createToken("ORDERFO")->plainTextToken;
+       
+                   return $this->dataResponse([
+                       'activation'=> 1 ,
+                       'token' =>$token ], 'logged in successfully',200);
+                   
+       
+           }
+           return $this->dataResponse(null,'failed to login password && email does not match our record',422);
+       }
+       
 }

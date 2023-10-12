@@ -274,28 +274,8 @@ public function submitToken(TokenRequest $request)
         ]
     );
 
-//    $token = Token::where('device_id',$data['device_id'])->first();
-//    if($token)
-//     {
-//      $token->update([
-//         'token'       => $data['token'],
-//         'user_id'     => auth()->user()->id
-//       ]);
-//     }
-//    else
-//     {
-//     $request->user()->tokens()->create([
-//      'device_id'   => $data['device_id'],
-//      'token'       => $data['token'],
-//      'device_type' => $data['device_type']
-//     ]);
-
-    // }
-
     return $this->dataResponse(null,__('submitted successfully'),200);
 
-  
-
-}
+  }
 
 }

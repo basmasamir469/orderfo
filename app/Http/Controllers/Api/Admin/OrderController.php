@@ -128,7 +128,7 @@ class OrderController extends Controller
             ]);
 
             DB::commit();
-            $tokens=Token::where('user_id',$order->user_id)->pluck('token')->toArray();
+            $tokens = Token::where('user_id',$order->user_id)->pluck('token')->toArray();
            
             $data=[
                 'title'    => $notification->translate('en')->title,

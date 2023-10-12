@@ -5,11 +5,11 @@ use App\Models\Setting;
 
 	trait SendNotification{
           
-		function notifyByFirebase($tokens,$data = [])        // paramete 5 =>>>> $type
+		function notifyByFirebase($tokens,$data = [],$type=null)        // paramete 5 =>>>> $type
         {
             $fcmMsg = array(
-                'body' => $data['body'],
-                'title' => $data['title'],
+                'body' => $data['body']??'',
+                'title' => $data['title']??'',
                 'sound' => "default",
                 'color' => "#203E78"
             );
@@ -19,6 +19,13 @@ use App\Models\Setting;
                 // 'topic'  => 'offer',
                 'priority' => 'high',
                 'notification' => $fcmMsg,
+                'data' => $data
+            );
+
+            $silentFcmFields = array(
+                'registration_ids' => $tokens,
+                'priority' => 'high',
+                "content_available"=> true,
                 'data' => $data
             );
             $firebase_key=Setting::where('key','firebase_access_key')->first()?->value['en'];
@@ -34,7 +41,7 @@ use App\Models\Setting;
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fcmFields));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(($type == "silent")? $silentFcmFields :$fcmFields));
             $result = curl_exec($ch);
             curl_close($ch);
             return $result;
