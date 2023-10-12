@@ -40,7 +40,7 @@ class ConversationTransformer extends TransformerAbstract
             'sender_logo' =>auth()->user()->hasRole('resturant')? $conversation->user->getFirstMediaUrl('users-images') :$conversation->resturant->getFirstMediaUrl('resturants-logos'),
             'is_muted'=>$conversation->is_muted,
             'last_message_date'=>$conversation->last_message_date,
-            'last_message'=> $last_message->text != null? $last_message->text : $last_message->getFirstMediaUrl('message-images'),
+            'last_message'=> fractal($last_message,new MessageTransformer())->toArray(),
         ];
 
         return $array;

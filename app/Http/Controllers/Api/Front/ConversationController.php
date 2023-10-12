@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Token;
 use App\Transformers\ConversationTransformer;
+use App\Transformers\MessageTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\Conversions\Conversion;
@@ -41,8 +42,12 @@ class ConversationController extends Controller
     public function show($id)
     {
         $conversation = Conversation::findOrFail($id);
+        $messages = fractal()
+        ->collection($conversation->messages)
+        ->transformWith(new MessageTransformer())
+        ->toArray();   
 
-        return $this->dataResponse(fractal($conversation,new ConversationTransformer())->parseIncludes('messages')->toArray(), 'conversation messages', 200);
+        return $this->dataResponse($messages, 'conversation messages', 200);
         
     }
 
@@ -55,7 +60,7 @@ class ConversationController extends Controller
                 'resturant_id'=>$request->resturant_id 
             ]);
 
-       $message= $conversation->messages()->create([
+       $message = $conversation->messages()->create([
                'text'=>$request->text,
                'sender_type'=>'user',
                'user_id'=>$request->user()->id,
@@ -72,8 +77,10 @@ class ConversationController extends Controller
                         ->toMediaCollection('messages-images');
         }
         $tokens = Token::where('resturant_id',$request->resturant_id)->pluck('token')->toArray();
-        
-        $this->notifyByFirebase($tokens,[],"silent");
+        $data = [
+            'message_id' => $message->id
+        ];
+        $this->notifyByFirebase($tokens,$data,"silent");
         return $this->dataResponse(null,'message sent successfully',200);
     }
 }

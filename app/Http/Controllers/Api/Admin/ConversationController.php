@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Token;
 use App\Transformers\ConversationTransformer;
+use App\Transformers\MessageTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\Conversions\Conversion;
@@ -17,13 +18,15 @@ class ConversationController extends Controller
         $skip = $request->skip? $request->skip : 0;
         $take = $request->skip? $request->take : 10;
         $conversations = $request->user()->conversations()
-                                         ->search()
-                                         ->skip($skip)
-                                         ->take($take)
-                                         ->orderBy('updated_at','desc')
-                                         ->get();
+                                         ->whereHas('messages')
+                                         ->search();
 
-        $count =count($request->user()->conversations);
+        $count = $conversations->count();
+        $conversations = $conversations->skip($skip)
+                                       ->take($take)
+                                       ->orderBy('updated_at','desc')
+                                       ->get();
+
         $conversations = fractal()
         ->collection($conversations)
         ->transformWith(new ConversationTransformer())
@@ -38,8 +41,12 @@ class ConversationController extends Controller
     public function show($id)
     {
         $conversation = Conversation::findOrFail($id);
+        $messages = fractal()
+        ->collection($conversation->messages)
+        ->transformWith(new MessageTransformer())
+        ->toArray();   
 
-        return $this->dataResponse(fractal($conversation,new ConversationTransformer())->parseIncludes('messages')->toArray(), 'conversation messages', 200);
+        return $this->dataResponse($messages, 'conversation messages', 200);
         
     }
 
@@ -71,8 +78,11 @@ class ConversationController extends Controller
                         ->toMediaCollection('messages-images');
         }
         $tokens = Token::where('user_id',$request->user_id)->pluck('token')->toArray();
-        
-        $this->notifyByFirebase($tokens,[],"silent");
+        $data = [
+            'message_id' => $message->id
+        ];
+
+        $this->notifyByFirebase($tokens,$data,"silent");
         return $this->dataResponse(null,'message sent successfully',200);
     }
 }

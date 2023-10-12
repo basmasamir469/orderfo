@@ -40,7 +40,7 @@ class MessageTransformer extends TransformerAbstract
             'time'       =>Carbon::parse($message->created_at)->format('h:i A'),
             'date'       =>$message->date,
             'is_read'    =>$message->is_read,
-            'sender_name'=>$message->sender_type  == "user"? $message->user->name : $message->resturant->name,
+            'sender_name'=>$message->sender_type  == "user"? $message->user->fname : $message->resturant->name,
             'sender_image'=>$message->sender_type == "user"? $message->user->getFirstMediaUrl('users-images') : $message->resturant->getFirstMediaUrl('resturants-logos'),
         ];
     }
