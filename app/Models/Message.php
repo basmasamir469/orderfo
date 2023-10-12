@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -26,5 +27,10 @@ class Message extends Model implements HasMedia
     public function resturant()
     {
         return $this->belongsTo('App\Models\Resturant');
+    }
+
+    public function getDateAttribute()
+    {
+        return  (Carbon::now()->year == Carbon::parse($this->created_at)->year)? Carbon::parse($this->created_at)->format('M d') : Carbon::parse($this->created_at)->format('Y M d');
     }
 }

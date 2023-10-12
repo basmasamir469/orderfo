@@ -39,7 +39,9 @@ class Conversation extends Model
     public function getLastMessageDateAttribute()
     {
         $last_message = $this->messages()->latest()->first();
-       return Carbon::parse($last_message->created_at)->format('M d') == Carbon::today()->format('M d')? Carbon::parse($last_message->created_at)->format('h:i A') : Carbon::parse($last_message->created_at)->format('M d');
+        $date = (Carbon::now()->year == Carbon::parse($last_message->created_at)->year)? Carbon::parse($last_message->created_at)->format('M d') : Carbon::parse($last_message->created_at)->format('Y M d');
+        $time = Carbon::parse($last_message->created_at)->format('h:i A');
+       return  (Carbon::parse($last_message->created_at)->format('M d') == Carbon::today()->format('M d'))? $time : $date;
 
     }
 
