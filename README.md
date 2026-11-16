@@ -1,66 +1,237 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# OrderFo
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+OrderFo is a Laravel-based food ordering and restaurant management system. It is designed to support both customers and administrators in managing food items, orders, restaurants, delivery areas, and store settings through a simple API-driven architecture.
 
-## About Laravel
+This project is built for a food marketplace workflow where:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Customers can register, sign in, manage addresses, browse meals, and place orders.
+- Restaurants can manage their menu, categories, and related content.
+- Admins can control areas, sliders, settings, restaurant listings, and orders.
+- The application exposes separate API modules for front-end users and admin users.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Project idea in simple words
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Think of OrderFo as a restaurant ordering platform similar to a food delivery app. A user can:
 
-## Learning Laravel
+1. Browse restaurants and meals
+2. Add food to a cart
+3. Choose delivery address and payment method
+4. Place an order
+5. Track the order or communicate through the app
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+At the same time, an admin can manage:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- restaurants
+- meal categories
+- available areas
+- promotional sliders
+- order updates
+- app settings
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Main features
 
-## Laravel Sponsors
+- User authentication and authorization
+- Address management for delivery
+- Restaurant and meal browsing
+- Cart and order management
+- Admin panel for managing categories, meals, sliders, orders, and settings
+- Localization support for multilingual content
+- Media support for restaurant and meal images
+- Notifications and conversation/chat-like communication features
+- API structure separated into Front and Admin modules
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Technology stack
 
-### Premium Partners
+- PHP 8.1
+- Laravel 10
+- MySQL database
+- Laravel UI for authentication views
+- Laravel Sanctum / token-based API support
+- Spatie packages for permissions, media, and translations
+- Vite for frontend asset building
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Project structure
 
-## Contributing
+```text
+orderfo/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Api/
+│   │   │   │   ├── Admin/         # Admin API endpoints
+│   │   │   │   └── Front/         # Customer-facing API endpoints
+│   │   └── Middleware/
+│   ├── Models/                   # Core business models such as User, Meal, Order, Restaurant
+│   ├── Providers/
+│   └── ...
+├── config/
+├── database/
+│   ├── migrations/
+│   ├── seeders/
+│   └── settings.php
+├── public/
+├── resources/
+├── routes/
+│   └── web.php
+├── tests/
+├── .env.example
+├── composer.json
+├── package.json
+├── phpunit.xml
+├── vite.config.js
+├── artisan
+└── README.md
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Key modules
 
-## Code of Conduct
+### Front API
+The `app/Http/Controllers/Api/Front` folder contains functions for customer actions, such as:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- authentication and login
+- cart operations
+- order placement
+- restaurant and meal browsing
+- address management
+- conversations and user interactions
 
-## Security Vulnerabilities
+### Admin API
+The `app/Http/Controllers/Api/Admin` folder contains functions for business management, such as:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- restaurant management
+- meal and category management
+- area and slider management
+- order processing
+- system settings
+
+### Models
+The project contains domain models like:
+
+- `User`
+- `Meal`
+- `Order`
+- `Resturant`
+- `Category`
+- `Cart`
+- `Address`
+- `Setting`
+- `Area`
+- `Governorate`
+- `Review`
+
+These models represent the main entities of the ordering platform.
+
+## Database and data design
+
+The application uses Laravel migrations and a relational database model. The main entities in the system are centered around:
+
+- users
+- restaurants
+- categories
+- meals
+- orders
+- carts
+- addresses
+- settings and localization entries
+
+## How the app works
+
+A typical user flow looks like this:
+
+1. User signs up or logs in
+2. User opens the app and browses restaurants and meals
+3. User adds food to the cart
+4. User enters the delivery address
+5. User places an order
+6. Admin receives and processes the order
+7. The app updates order status and keeps settings consistent
+
+## Setup instructions
+
+### 1. Clone the project
+
+```bash
+git clone https://github.com/basmasamir469/orderfo.git
+cd orderfo
+```
+
+### 2. Install PHP dependencies
+
+```bash
+composer install
+```
+
+### 3. Create environment file
+
+```bash
+cp .env.example .env
+```
+
+### 4. Generate application key
+
+```bash
+php artisan key:generate
+```
+
+### 5. Configure the database
+
+Update your `.env` file with your database credentials, then run:
+
+```bash
+php artisan migrate
+```
+
+You can also seed the database if required by your environment.
+
+### 6. Install frontend dependencies
+
+```bash
+npm install
+npm run build
+```
+
+### 7. Run the project
+
+```bash
+php artisan serve
+```
+
+Then open the app in your browser at:
+
+```text
+http://localhost:8000
+```
+
+## Notes for understanding the project
+
+This repo is not a simple starter Laravel app. It is a working food-ordering application with a backend structure designed around business features. The main important folders for a new developer are:
+
+- `app/Http/Controllers/Api/Front` → customer actions
+- `app/Http/Controllers/Api/Admin` → admin actions
+- `app/Models` → application data models
+- `database/migrations` → database schema design
+- `routes/web.php` → web routes
+
+## Why this project matters
+
+OrderFo is a practical example of a full-stack Laravel application built around real business logic. It combines:
+
+- backend API logic
+- database modeling
+- order management
+- multilingual support
+- admin operations
+- user-facing features
+
+This makes it a useful project for learning how a real food delivery application can be structured in Laravel.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is currently using the standard Laravel project setup and is intended as a learning or business application codebase.
+
+If you want, I can also help you create:
+
+- a more professional GitHub README in English
+- a bilingual Arabic/English README
+- a shorter startup README for non-technical users
+- a detailed developer README with API documentation
