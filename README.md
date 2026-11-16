@@ -224,14 +224,3 @@ OrderFo is a practical example of a full-stack Laravel application built around 
 - user-facing features
 
 This makes it a useful project for learning how a real food delivery application can be structured in Laravel.
-
-## License
-
-This project is currently using the standard Laravel project setup and is intended as a learning or business application codebase.
-
-If you want, I can also help you create:
-
-- a more professional GitHub README in English
-- a bilingual Arabic/English README
-- a shorter startup README for non-technical users
-- a detailed developer README with API documentation
